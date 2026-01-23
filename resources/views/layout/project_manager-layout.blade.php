@@ -97,23 +97,21 @@
 
 <nav>
     <ul>
-
         <!-- Dashboard -->
         <li>
-            <a href="{{route('admin.dashboard')}}">Dashboard</a>
+            <a href="{{route('pm.dashboard')}}">Dashboard</a>
         </li>
-
-        <!-- User Management -->
+        <!-- Team -->
         <li>
-            <a href="#">User Management</a>
+            <a href="#">My Team</a>
             <ul>
                 <!-- Project Managers -->
                 <li>
-                    <a href="{{route('admin.project-managers')}}">Project Managers</a>
+                    <a href="{{route('pm.developers')}}">Developers</a>
+                    <a href="{{route('pm.testers')}}">Testers</a>
                 </li>
             </ul>
         </li>
-
         <!-- Logout -->
         <li>
             <form action="/logout" method="post">
