@@ -23,7 +23,6 @@ CREATE TABLE projects (
     project_manager_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    priority ENUM('low','medium','high','critical') DEFAULT 'medium',
     status ENUM('planned','in_progress','on_hold','completed','cancelled') DEFAULT 'planned',
     start_date DATE,
     end_date DATE,
@@ -42,39 +41,66 @@ CREATE TABLE modules (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     status ENUM('not_started','in_progress','blocked','completed') DEFAULT 'not_started',
-    progress INT DEFAULT 0,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_modules_project FOREIGN KEY (project_id) REFERENCES projects(id),
     CONSTRAINT fk_modules_parent FOREIGN KEY (parent_module_id) REFERENCES modules(id)
 );
 
--- =====================================================
+CREATE TABLE module_documentations (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    module_id BIGINT UNSIGNED NOT NULL,
+    written_by BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content LONGTEXT NOT NULL,
+    version VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
--- 4. TASKS (RECURSIVE)
+    FOREIGN KEY (module_id) REFERENCES modules(id),
+    FOREIGN KEY (written_by) REFERENCES users(id)
+);
+
 CREATE TABLE tasks (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     project_id BIGINT UNSIGNED NOT NULL,
     module_id BIGINT UNSIGNED NOT NULL,
-    parent_task_id BIGINT UNSIGNED NULL,
-    assigned_to BIGINT UNSIGNED NULL,
+    assigned_to BIGINT UNSIGNED,
     created_by BIGINT UNSIGNED NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    task_type ENUM('development','bug_fix','testing') NOT NULL,
     priority ENUM('low','medium','high','critical') DEFAULT 'medium',
-    status ENUM('todo','in_progress','code_review','testing','reopened','done') DEFAULT 'todo',
+    status ENUM('todo','in_progress','code_review','done') DEFAULT 'todo',
     estimated_hours DECIMAL(5,2),
     actual_hours DECIMAL(5,2),
     due_date DATE,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_tasks_project FOREIGN KEY (project_id) REFERENCES projects(id),
-    CONSTRAINT fk_tasks_module FOREIGN KEY (module_id) REFERENCES modules(id),
-    CONSTRAINT fk_tasks_parent FOREIGN KEY (parent_task_id) REFERENCES tasks(id),
-    CONSTRAINT fk_tasks_assigned FOREIGN KEY (assigned_to) REFERENCES users(id),
-    CONSTRAINT fk_tasks_creator FOREIGN KEY (created_by) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (module_id) REFERENCES modules(id),
+    FOREIGN KEY (assigned_to) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
+
+CREATE TABLE bugs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    project_id BIGINT UNSIGNED NOT NULL,
+    module_id BIGINT UNSIGNED NOT NULL,
+    reported_by BIGINT UNSIGNED NOT NULL,
+    assigned_to BIGINT UNSIGNED NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    severity ENUM('minor','major','critical','blocker') DEFAULT 'minor',
+    status ENUM('open','in_progress','fixed','reopened','closed') DEFAULT 'open',
+    steps_to_reproduce TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (module_id) REFERENCES modules(id),
+    FOREIGN KEY (reported_by) REFERENCES users(id),
+    FOREIGN KEY (assigned_to) REFERENCES users(id)
+);
+
 
 -- =====================================================
 
@@ -91,33 +117,30 @@ CREATE TABLE module_testers (
 
 -- =====================================================
 
--- 6. TASK COMMENTS (RECURSIVE / LINKED LIST)
-CREATE TABLE task_comments (
+CREATE TABLE bug_comments (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    task_id BIGINT UNSIGNED NOT NULL,
-    parent_comment_id BIGINT UNSIGNED NULL,
+    bug_id BIGINT UNSIGNED NOT NULL,
     user_id BIGINT UNSIGNED NOT NULL,
     comment TEXT NOT NULL,
-    comment_type ENUM('general','issue','suggestion','blocker') DEFAULT 'general',
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_comments_task FOREIGN KEY (task_id) REFERENCES tasks(id),
-    CONSTRAINT fk_comments_parent FOREIGN KEY (parent_comment_id) REFERENCES task_comments(id),
-    CONSTRAINT fk_comments_user FOREIGN KEY (user_id) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (bug_id) REFERENCES bugs(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- =====================================================
 
 -- 7. TASK ATTACHMENTS
-CREATE TABLE task_attachments (
+CREATE TABLE bug_attachments (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    task_id BIGINT UNSIGNED NOT NULL,
+    bug_id BIGINT UNSIGNED NOT NULL,
     uploaded_by BIGINT UNSIGNED NOT NULL,
     file_path VARCHAR(500) NOT NULL,
     file_type VARCHAR(100),
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_attachments_task FOREIGN KEY (task_id) REFERENCES tasks(id),
-    CONSTRAINT fk_attachments_user FOREIGN KEY (uploaded_by) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (bug_id) REFERENCES bugs(id),
+    FOREIGN KEY (uploaded_by) REFERENCES users(id)
 );
 
 -- =====================================================
