@@ -22,17 +22,20 @@
             max-width: 900px;
             margin: 0px auto;
             font-family: Arial, sans-serif;
+            z-index: 9999;
         }
 
         nav ul {
             list-style: none;
             margin: 0;
             padding: 0;
+            z-index: 9999;
         }
 
         nav > ul > li {
             display: inline-block;
             position: relative;
+            z-index: 9999;
         }
 
         nav a {
@@ -41,10 +44,12 @@
             color: #fff;
             text-decoration: none;
             white-space: nowrap;
+            z-index: 9999;
         }
 
         nav a:hover {
             background: #444;
+            z-index: 9999;
         }
 
         /* Dropdowns */
@@ -55,20 +60,24 @@
             min-width: 180px;
             top: 100%;
             left: 0;
+            z-index: 9999;
         }
 
         nav ul ul li {
             position: relative;
+            z-index: 9999;
         }
 
         nav ul li:hover > ul {
             display: block;
+            z-index: 9999;
         }
 
         /* Nested dropdowns (right side) */
         nav ul ul ul {
             top: 0;
             left: 100%;
+            z-index: 9999;
         }
 
     </style>
