@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProjectModel;
 use App\Models\User;
+use App\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -233,6 +235,44 @@ class ProjectManagerController extends Controller
         ]);
 
         return back()->with('success', 'Tester updated successfully.');
+    }
+
+    public function projectsIndex(Request $request) {
+        $pmId = Auth::id();
+
+        $projects = ProjectModel::where('project_manager_id', $pmId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('project_manager.projects.index' , compact('projects'));
+    }
+
+    public function projectCreate(Request $request)
+    {
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_date'  => 'required|date',
+            'end_date'    => 'nullable|date|after_or_equal:start_date',
+        ]);
+
+        ProjectModel::create([
+            'project_manager_id' => Auth::id(), // or $request->user()->id
+            'name'               => $request->name,
+            'description'        => $request->description,
+            'status'             => $request->status,
+            'start_date'         => $request->start_date,
+            'end_date'           => $request->end_date,
+        ]);
+
+        return redirect()
+            ->route('pm.projects')
+            ->with('success', 'Project created successfully');
+    }
+
+    public function projectView($project_id) {
+        $project = ProjectModel::find($project_id);
+        return view('project_manager.projects.view' , compact('project'));
     }
 
 }

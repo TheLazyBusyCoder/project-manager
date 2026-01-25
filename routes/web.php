@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeveloperController;
 use App\Http\Controllers\ProjectManagerController;
 use App\Http\Controllers\TesterController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,9 @@ Route::get('/', function () {
     return view('welcome');
 })->name('index');
 
+Route::get('/login' , function(Request $request) {
+    return redirect()->route('index');
+});
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::get('/setup-account', [AuthController::class, 'showSetupForm']);
@@ -51,29 +55,44 @@ Route::middleware(['auth'])->group(function () {
     | Project Manager Routes
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:project_manager'])->prefix('project-manager')->group(function () {
-        Route::get('/', [ProjectManagerController::class, 'dashboard'])->name('pm.dashboard');
-        Route::get('developers', [ProjectManagerController::class, 'developersIndex'])
-        ->name('pm.developers');
-        Route::post('developers', [ProjectManagerController::class, 'developersStore'])
-        ->name('pm.developers');
-        Route::get('/developer/{developer_id}' , [ProjectManagerController::class, 'developerView'])->name('pm.developer');
-        Route::delete('/developer/{developer_id}', [ProjectManagerController::class, 'developerDelete'])
-        ->name('pm.developer.delete');
-        Route::put('developers/{developer_id}', [ProjectManagerController::class, 'developersUpdate'])
-        ->name('pm.developers.update');
+    Route::middleware(['role:project_manager'])
+    ->prefix('project-manager')
+    ->controller(ProjectManagerController::class)
+    ->group(function () {
 
-        Route::get('testers', [ProjectManagerController::class, 'testersIndex'])
-        ->name('pm.testers');
-        Route::post('testers', [ProjectManagerController::class, 'testersStore'])
-        ->name('pm.testers');
-        Route::get('/tester/{tester_id}', [ProjectManagerController::class, 'testerView'])
-        ->name('pm.tester');
-        Route::delete('/tester/{tester_id}', [ProjectManagerController::class, 'testerDelete'])
-        ->name('pm.tester.delete');
-        Route::put('/testers/{tester_id}', [ProjectManagerController::class, 'testersUpdate'])
-        ->name('pm.testers.update');
+        // Dashboard
+        Route::get('/', 'dashboard')->name('pm.dashboard');
+
+        // Developers
+        Route::prefix('developers')->group(function () {
+            Route::get('/', 'developersIndex')->name('pm.developers');
+            Route::post('/', 'developersStore')->name('pm.developers');
+            Route::put('/{developer_id}', 'developersUpdate')->name('pm.developers.update');
+        });
+        Route::prefix('developer')->group(function () {
+            Route::get('/{developer_id}', 'developerView')->name('pm.developer');
+            Route::delete('/{developer_id}', 'developerDelete')->name('pm.developer.delete');
+        });
+
+        // Testers
+        Route::prefix('testers')->group(function () {
+            Route::get('/', 'testersIndex')->name('pm.testers');
+            Route::post('/', 'testersStore')->name('pm.testers');
+            Route::put('/{tester_id}', 'testersUpdate')->name('pm.testers.update');
+        });
+        Route::prefix('tester')->group(function () {
+            Route::get('/{tester_id}', 'testerView')->name('pm.tester');
+            Route::delete('/{tester_id}', 'testerDelete')->name('pm.tester.delete');
+        });
+
+        // Projects
+        Route::prefix('projects')->group(function() {
+            Route::get('/' , 'projectsIndex')->name('pm.projects');
+            Route::get('/{project_id}' , 'projectView')->name('pm.project.view');
+            Route::post('/' , 'projectCreate')->name('pm.projects.create');
+        });
     });
+
 
     /*
     |--------------------------------------------------------------------------

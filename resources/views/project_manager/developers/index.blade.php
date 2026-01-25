@@ -76,34 +76,14 @@
 </style>
 
 <div class="container">
-    <h1>PM Panel</h1>
-    <p>Manage Developers</p>
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" data-tab="list">DEVELOPERS</div>
+        <div class="tab " data-tab="create">CREATE</div>
+    </div>
 
-    <div class="card">
-        <h3>Developers</h3>
-        <div class="actions">
-            <form method="post" action="{{ route('pm.developers') }}" autocomplete="off" onsubmit="return confirm('Are you sure?')">
-                @csrf
-                <input 
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    autocomplete="none"
-                    class="btn"
-                    required
-                >
-                <input 
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    autocomplete="new-email"
-                    class="btn"
-                    required
-                >
-                <button class="btn">Add Developer</button>
-            </form>
-        </div>
-
+    <!-- Tab Contents -->
+    <div class="tab-content" id="list" >
         <table>
             <thead>
                 <tr>
@@ -145,6 +125,48 @@
             </tbody>
         </table>
     </div>
-</div>
 
+    <div class="tab-content" id="create" style="display:none;">
+        <form method="post" action="{{ route('pm.developers') }}" autocomplete="off" onsubmit="return confirm('Are you sure?')">
+            @csrf
+
+            <table class="form-table">
+                <tr>
+                    <td><label>Name</label></td>
+                    <td>
+                        <input 
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            autocomplete="none"
+                            class="btn"
+                            required
+                        >
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label>Email</label></td>
+                    <td>
+                        <input 
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            autocomplete="new-email"
+                            class="btn"
+                            required
+                        >
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Action</td>
+                    <td>
+                         <button class="btn">Add Developer</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
 @endsection

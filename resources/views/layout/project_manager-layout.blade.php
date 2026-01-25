@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>@yield('title') - Project Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('css/base.css') }}">
+
+    @yield('head')
 
     {{-- Navbar --}}
     <style>
@@ -103,7 +106,7 @@
         </li>
         <!-- Team -->
         <li>
-            <a href="#">My Team</a>
+            <a href="#">Team</a>
             <ul>
                 <!-- Project Managers -->
                 <li>
@@ -111,6 +114,10 @@
                     <a href="{{route('pm.testers')}}">Testers</a>
                 </li>
             </ul>
+        </li>
+        <!-- Project -->
+        <li>
+            <a href="{{route('pm.projects')}}">Projects</a>
         </li>
         <!-- Logout -->
         <li>
@@ -131,5 +138,7 @@
     @yield('main')
 </div>
 
+<script src="{{asset('js/base.js')}}"></script>
+@yield('script')
 </body>
 </html>

@@ -63,9 +63,6 @@
 </style>
 
 <div class="container">
-    <h1>Tester Details</h1>
-    <p>{{ $tester->name }} - {{ $tester->email }}</p>
-
     <form method="POST" action="{{ route('pm.testers.update', $tester->id) }}">
         @csrf
         @method('PUT')

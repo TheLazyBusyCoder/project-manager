@@ -76,35 +76,57 @@
 </style>
 
 <div class="container">
-    <h1>PM Panel</h1>
-    <p>Manage Testers</p>
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" data-tab="list">TESTERS</div>
+        <div class="tab " data-tab="create">CREATE</div>
+    </div>
 
-    <div class="card">
-        <h3>Testers</h3>
-
+    <div class="tab-content" id="create" style="display:none;">
         <div class="actions">
             <form method="post" action="{{ route('pm.testers') }}" autocomplete="off" onsubmit="return confirm('Are you sure?')">
                 @csrf
-                <input 
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    class="btn"
-                    required
-                >
-                <input 
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    autocomplete="new-email"
-                    class="btn"
-                    required
-                >
-                <button class="btn">Add Tester</button>
+                <table class="form-table">
+                    <tr>
+                        <td><label>Name</label></td>
+                        <td>
+                            <input 
+                                type="text"
+                                name="name"
+                                placeholder="Name"
+                                class="btn"
+                                required
+                            >
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label>Email</label></td>
+                        <td>
+                            <input 
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                autocomplete="new-email"
+                                class="btn"
+                                required
+                            >
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label>Action</label></td>
+                        <td>
+                            <button class="btn">Add Tester</button>
+                        </td>
+                    </tr>
+                </table>
             </form>
         </div>
+    </div>
 
-        <table>
+    <div class="tab-content" id="list" >
+        <table class="form-table">
             <thead>
                 <tr>
                     <th>#</th>

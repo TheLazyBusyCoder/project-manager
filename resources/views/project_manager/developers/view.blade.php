@@ -77,8 +77,6 @@
 </style>
 
 <div class="container">
-    <h1>Developer Details</h1>
-    <p>{{ $developer->name }} - {{ $developer->email }}</p>
     <form method="POST" action="{{ route('pm.developers.update', $developer->id) }}">
         @csrf
         @method('PUT')

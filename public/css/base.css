@@ -1,0 +1,79 @@
+/* 1. CSS Reset (light, not aggressive) */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px; /* base size */
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #222;
+    background-color: #fff;
+    line-height: 1.6;
+}
+
+
+/* Tabs */
+
+.container {
+    max-width: 900px;
+    margin: 10px auto;
+    font-family: Arial, sans-serif;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #ccc;
+}
+
+.tab {
+    padding: 3px 6px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #f7f7f7;
+    margin-right: 2px;
+    font-weight: 500;
+}
+
+.tab.active {
+    background: #fff;
+    border-bottom: 2px solid #fff;
+    font-weight: 600;
+}
+
+/* Tab content */
+.tab-content {
+    border: 1px solid #ccc;
+    padding: 12px;
+    background: #fff;
+}
+
+/* Form */
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.form-table td {
+    vertical-align: top;
+}
+
+.form-table td:first-child {
+    width: 160px;
+    font-weight: 600;
+}
+
+.form-table input,
+.form-table textarea,
+.form-table select {
+    box-sizing: border-box;
+}
