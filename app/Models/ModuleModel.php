@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProjectModel;
 
 class ModuleModel extends Model
 {
@@ -15,4 +16,9 @@ class ModuleModel extends Model
         'description',
         'status',
     ];
+
+    public function parent()
+    {
+        return $this->belongsTo(ProjectModel::class, 'parent_module_id');
+    }
 }

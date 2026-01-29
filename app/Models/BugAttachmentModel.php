@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BugAttachment extends Model
+class BugAttachmentModel extends Model
 {
     protected $table = 'bug_attachments';
 

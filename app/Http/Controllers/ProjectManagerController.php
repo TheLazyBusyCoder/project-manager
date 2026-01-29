@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProjectModel;
+use App\Models\ModuleModel;
 use App\Models\User;
 use App\Project;
 use Illuminate\Http\Request;
@@ -270,9 +271,39 @@ class ProjectManagerController extends Controller
             ->with('success', 'Project created successfully');
     }
 
-    public function projectView($project_id) {
-        $project = ProjectModel::find($project_id);
-        return view('project_manager.projects.view' , compact('project'));
+    public function projectView($project_id)
+    {
+        $project = ProjectModel::findOrFail($project_id);
+
+        $modules = ModuleModel::with('parent')
+            ->where('project_id', $project_id)
+            ->where('')
+            ->orderBy('created_at')
+            ->get();
+
+        return view('project_manager.projects.view', compact(
+            'project',
+            'modules'
+        ));
+    }
+
+    public function moduleCreate(Request $request, $project_id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'status' => 'required',
+            'parent_module_id' => 'nullable|exists:modules,id'
+        ]);
+
+        ModuleModel::create([
+            'project_id'        => $project_id,
+            'parent_module_id'  => $request->parent_module_id,
+            'name'              => $request->name,
+            'description'       => $request->description,
+            'status'            => $request->status,
+        ]);
+
+        return back()->with('success', 'Module created successfully');
     }
 
 }

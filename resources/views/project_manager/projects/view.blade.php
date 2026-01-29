@@ -9,6 +9,7 @@
 
 @section('main')
 
+
 <style>
     .container {
         max-width: 900px;
@@ -16,11 +17,31 @@
         font-family: Arial, sans-serif;
     }
 
+    h1 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    p {
+        color: #555;
+        margin-bottom: 20px;
+    }
+
     .card {
         border: 1px solid #ddd;
         padding: 15px;
         margin-bottom: 20px;
         border-radius: 4px;
+    }
+
+    .card h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .actions {
+        margin-bottom: 15px;
+        margin-top: 15px;
     }
 
     .btn {
@@ -63,103 +84,102 @@
 </style>
 
 <div class="container">
-    <div class="card">
-        <div id="network" style="width:100%; height:400px;"></div>
-    </div>
+         <div class="card">
+            Status: {{ $project->status }},
+            Project: {{ $project->name }} ( {{$project->start_date}} - {{$project->end_date}} ) <br>
+            Description: {{ $project->description }}
+
+            <hr>
+
+            <h3>Modules</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Parent</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($modules as $module)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $module->name }}</td>
+                            <td>{{ $module->status }}</td>
+                            <td>
+                                {{ optional($module->parent)->name ?? '-' }}
+                            </td>
+                            <td>{{ $module->created_at->format('d M Y') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5">No modules created yet.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <hr>
+
+            <h3>Create Module</h3>
+
+            <form method="POST" action="{{ route('pm.modules.create', $project->id) }}">
+                @csrf
+
+                <table>
+                    <tr>
+                        <td>Module Name</td>
+                        <td>
+                            <input type="text" name="name" required style="width:100%">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Description</td>
+                        <td>
+                            <textarea name="description" rows="3" style="width:100%"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Parent Module</td>
+                        <td>
+                            <select name="parent_module_id" style="width:100%">
+                                <option value="">None</option>
+                                @foreach ($modules as $m)
+                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Status</td>
+                        <td>
+                            <select name="status">
+                                <option value="not_started">Not Started</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="blocked">Blocked</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="actions">
+                    <button class="btn">Create Module</button>
+                </div>
+            </form>
+
+            <div class="actions">
+                <a href="{{ route('pm.projects') }}" class="btn">Back</a>
+            </div>
+        </div>
+    </form>
+
 </div>
 
-<script>
-  const nodes = new vis.DataSet([
-    {
-      id: 1,
-      label: 'Admin',
-      shape: 'box',
-      color: '#ffeaa7',
-      font: { size: 16, align: 'center' },
-      margin: 12
-    },
-    {
-      id: 2,
-      label: 'Project\nManager',
-      shape: 'box',
-      color: '#74b9ff',
-      font: { size: 15, align: 'center' },
-      widthConstraint: { minimum: 130, maximum: 160 },
-      margin: 12
-    },
-    {
-      id: 3,
-      label: 'Developer',
-      shape: 'ellipse',
-      color: '#55efc4',
-      font: { size: 14 }
-    },
-    {
-      id: 4,
-      label: 'Tester',
-      shape: 'ellipse',
-      color: '#81ecec',
-      font: { size: 14 }
-    },
-    {
-      id: 5,
-      label: 'Bug\nTracking\nSystem',
-      shape: 'box',
-      color: '#fab1a0',
-      font: { size: 14, align: 'center' },
-      widthConstraint: { minimum: 150 },
-      margin: 14
-    },
-    {
-      id: 6,
-      label: 'Bug\nReport',
-      shape: 'box',
-      color: '#fdcb6e',
-      font: { size: 13, align: 'center' },
-      margin: 10
-    }
-  ]);
-
-  const edges = new vis.DataSet([
-    { from: 1, to: 2, arrows: 'to', label: 'creates projects' },
-    { from: 2, to: 3, arrows: 'to', label: 'assigns tasks' },
-    { from: 2, to: 4, arrows: 'to', label: 'assigns tests' },
-    { from: 3, to: 5, arrows: 'to', label: 'fixes bugs' },
-    { from: 4, to: 6, arrows: 'to', label: 'reports bugs' },
-    { from: 6, to: 5, arrows: 'to', label: 'stored in' }
-  ]);
-
-  const container = document.getElementById('network');
-
-  const data = { nodes, edges };
-
-  const options = {
-    layout: {
-      hierarchical: {
-        direction: 'UD',
-        sortMethod: 'directed',
-        levelSeparation: 120,
-        nodeSpacing: 150
-      }
-    },
-    nodes: {
-      borderWidth: 1,
-      shadow: true
-    },
-    edges: {
-      font: {
-        align: 'middle',
-        size: 12
-      },
-      smooth: true
-    },
-    interaction: {
-      hover: true,
-      dragNodes: true
-    },
-    physics: false
-  };
-
-  new vis.Network(container, data, options);
-</script>
 @endsection
