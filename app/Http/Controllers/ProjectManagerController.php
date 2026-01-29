@@ -277,7 +277,7 @@ class ProjectManagerController extends Controller
 
         $modules = ModuleModel::with('parent')
             ->where('project_id', $project_id)
-            ->where('')
+            ->where('parent_module_id' , null)
             ->orderBy('created_at')
             ->get();
 

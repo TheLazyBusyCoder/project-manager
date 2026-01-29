@@ -91,6 +91,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{project_id}' , 'projectView')->name('pm.project.view');
             Route::post('/' , 'projectCreate')->name('pm.projects.create');
             Route::post('/{project_id}/modules', 'moduleCreate')->name('pm.modules.create');
+            Route::get(
+                '/pm/projects/{project}/modules/{module}',
+                [ProjectController::class, 'moduleView']
+            )->name('pm.projects.modules.view');
+
         });
     });
 

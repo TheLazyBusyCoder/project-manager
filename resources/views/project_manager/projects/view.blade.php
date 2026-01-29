@@ -84,102 +84,103 @@
 </style>
 
 <div class="container">
-         <div class="card">
-            Status: {{ $project->status }},
-            Project: {{ $project->name }} ( {{$project->start_date}} - {{$project->end_date}} ) <br>
-            Description: {{ $project->description }}
 
-            <hr>
+        Status: {{ $project->status }},
+        Project: {{ $project->name }} ( {{$project->start_date}} - {{$project->end_date}} ) <br>
+        Description: {{ $project->description }}
 
-            <h3>Modules</h3>
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" data-tab="list">MODULES</div>
+        <div class="tab " data-tab="create">CREATE</div>
+    </div>
+
+    <hr>
+
+    <div class="tab-content" id="list" >
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Parent</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($modules as $module)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $module->name }}</td>
+                        <td>{{ $module->status }}</td>
+                        <td>
+                            {{ optional($module->parent)->name ?? '-' }}
+                        </td>
+                        <td>{{ $module->created_at->format('d M Y') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5">No modules created yet.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="create" style="display:none;">
+        <form method="POST" action="{{ route('pm.modules.create', $project->id) }}">
+            @csrf
 
             <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th>Parent</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($modules as $module)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $module->name }}</td>
-                            <td>{{ $module->status }}</td>
-                            <td>
-                                {{ optional($module->parent)->name ?? '-' }}
-                            </td>
-                            <td>{{ $module->created_at->format('d M Y') }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5">No modules created yet.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
+                <tr>
+                    <td>Module Name</td>
+                    <td>
+                        <input type="text" name="name" class="btn" required style="width:100%">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Description</td>
+                    <td>
+                        <textarea name="description" class="btn" rows="3" style="width:100%"></textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Parent Module</td>
+                    <td>
+                        <select class="btn" name="parent_module_id" style="width:100%">
+                            <option value="">None</option>
+                            @foreach ($modules as $m)
+                                <option value="{{ $m->id }}">{{ $m->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Status</td>
+                    <td>
+                        <select class="btn" name="status">
+                            <option value="not_started">Not Started</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </td>
+                </tr>
             </table>
 
-            <hr>
-
-            <h3>Create Module</h3>
-
-            <form method="POST" action="{{ route('pm.modules.create', $project->id) }}">
-                @csrf
-
-                <table>
-                    <tr>
-                        <td>Module Name</td>
-                        <td>
-                            <input type="text" name="name" required style="width:100%">
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Description</td>
-                        <td>
-                            <textarea name="description" rows="3" style="width:100%"></textarea>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Parent Module</td>
-                        <td>
-                            <select name="parent_module_id" style="width:100%">
-                                <option value="">None</option>
-                                @foreach ($modules as $m)
-                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>Status</td>
-                        <td>
-                            <select name="status">
-                                <option value="not_started">Not Started</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="blocked">Blocked</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-
-                <div class="actions">
-                    <button class="btn">Create Module</button>
-                </div>
-            </form>
-
             <div class="actions">
-                <a href="{{ route('pm.projects') }}" class="btn">Back</a>
+                <button class="btn">Create Module</button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
+    <div class="actions">
+        <a href="{{ route('pm.projects') }}" class="btn">Back</a>
+    </div>
 </div>
 
 @endsection
