@@ -82,72 +82,99 @@
 
     </style>
 
-    {{-- Main --}}
     <style>
-        .main {
-            max-width: 900px;
-            margin: 0px auto;
+        body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            padding: 10px;
+            background: #f5f5f5;
         }
-    </style>
 
-    {{-- Message --}}
-    <style>
-        .message { 
+
+        /* MESSAGE */
+        .message {
             max-width: 900px;
-            margin: 0px auto;
-            font-family: Arial, sans-serif;
-            padding: 5px 15px;
+            margin: 10px auto;
+            background: #ebff7a;
+            text-align: center;
             font-weight: bold;
-            background-color: rgb(235, 255, 122);
+        }
+
+        /* GRID LAYOUT */
+        .layout {
+            max-width: 900px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        /* HISTORY */
+        .history {
+            background: #fff;
+            font-size: 14px;
             text-align: center;
         }
+
+        .history h4 {
+            margin-top: 0;
+        }
+
+        .history a {
+            display: block;
+            color: #555;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+
+        .history a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
 
-<nav>
-    <ul>
-        <!-- Dashboard -->
-        <li>
-            <a href="{{route('pm.dashboard')}}">Dashboard</a>
-        </li>
-        <!-- Team -->
-        <li>
-            <a href="#">Team</a>
-            <ul>
-                <!-- Project Managers -->
-                <li>
-                    <a href="{{route('pm.developers')}}">Developers</a>
-                    <a href="{{route('pm.testers')}}">Testers</a>
-                </li>
-            </ul>
-        </li>
-        <!-- Project -->
-        <li>
-            <a href="{{route('pm.projects')}}">Projects</a>
-        </li>
-        <!-- Logout -->
-        <li>
-            <form action="/logout" method="post">
-                @csrf
-                <button type="submit">Logout</button>
-            </form>
-        </li>
+    <nav class="navbar">
+        <ul>
+            <li><a href="{{route('pm.dashboard')}}">Dashboard</a></li>
 
-    </ul>
-</nav>
+            <li>
+                <a href="#">Team</a>
+                <ul class="dropdown">
+                    <li><a href="{{route('pm.developers')}}">Developers</a></li>
+                    <li><a href="{{route('pm.testers')}}">Testers</a></li>
+                </ul>
+            </li>
 
-@if(session('success'))
-<p class="message">{{session('success')}}</p>
-@endif
+            <li><a href="{{route('pm.projects')}}">Projects</a></li>
 
-<div class="main">
-    @yield('main')
-</div>
+            <li>
+                <form action="/logout" method="post">
+                    @csrf
+                    <button type="submit">Logout</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
 
-<script src="{{asset('js/base.js')}}"></script>
-@yield('script')
+    @if(session('success'))
+        <div class="message">{{ session('success') }}</div>
+    @endif
+
+    <div class="layout">
+        {{-- <aside class="history">
+            <h4>History</h4>
+            <a href="#">/projects/1</a>
+            <a href="#">/projects/2</a>
+            <a href="#">/projects</a>
+        </aside> --}}
+
+        <main class="main">
+            @yield('main')
+        </main>
+    </div>
+
+    <script src="{{asset('js/base.js')}}"></script>
+    @yield('script')
 </body>
+
 </html>

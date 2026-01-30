@@ -85,9 +85,9 @@
 
 <div class="container">
 
-        Status: {{ $project->status }},
-        Project: {{ $project->name }} ( {{$project->start_date}} - {{$project->end_date}} ) <br>
-        Description: {{ $project->description }}
+        Status: {{ $module->status }},
+        Module: {{ $module->name }} <br>
+        Description: {{ $module->description }}
 
     <!-- Tabs -->
     <div class="tabs">
@@ -104,23 +104,21 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Status</th>
-                    <th>Parent</th>
                     <th>Created</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($modules as $module)
+                @forelse ($modules as $child)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $module->name }}</td>
-                        <td>{{ $module->status }}</td>
+                        <td>{{ $child->name }}</td>
+                        <td>{{ $child->status }}</td>
+                        <td>{{ $child->created_at->format('d M Y') }}</td>
                         <td>
-                            {{ optional($module->parent)->name ?? '-' }}
-                        </td>
-                        <td>{{ $module->created_at->format('d M Y') }}</td>
-                        <td>
-                            <a href="{{route('pm.modules.view' , ['module_id' => $module->id])}}" class="btn">View</a>
+                            <a href="{{ route('pm.modules.view', $child->id) }}" class="btn">
+                                View
+                            </a>
                         </td>
                     </tr>
                 @empty
@@ -131,9 +129,9 @@
             </tbody>
         </table>
     </div>
-
+    {{-- {{  dd($module) }} --}}
     <div class="tab-content" id="create" style="display:none;">
-        <form method="POST" action="{{ route('pm.modules.create', $project->id) }}">
+        <form method="POST" action="{{ route('pm.modules.create.sub' , $module->id) }}">
             @csrf
 
             <table>
@@ -148,18 +146,6 @@
                     <td>Description</td>
                     <td>
                         <textarea name="description" class="btn" rows="3" style="width:100%"></textarea>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Parent Module</td>
-                    <td>
-                        <select class="btn" name="parent_module_id" style="width:100%">
-                            <option value="">None</option>
-                            @foreach ($modules as $m)
-                                <option value="{{ $m->id }}">{{ $m->name }}</option>
-                            @endforeach
-                        </select>
                     </td>
                 </tr>
 
@@ -180,10 +166,6 @@
                 <button class="btn">Create Module</button>
             </div>
         </form>
-    </div>
-
-    <div class="actions">
-        <a href="{{ route('pm.projects') }}" class="btn">Back</a>
     </div>
 </div>
 

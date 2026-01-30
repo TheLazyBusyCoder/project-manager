@@ -21,4 +21,15 @@ class ModuleModel extends Model
     {
         return $this->belongsTo(ProjectModel::class, 'parent_module_id');
     }
+
+    public function children()
+    {
+        return $this->hasMany(ModuleModel::class, 'parent_module_id');
+    }
+
+    public function parentModule()
+    {
+        return $this->belongsTo(ModuleModel::class, 'parent_module_id');
+    }
+
 }

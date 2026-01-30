@@ -306,4 +306,32 @@ class ProjectManagerController extends Controller
         return back()->with('success', 'Module created successfully');
     }
 
+    public function moduleCreateSub(Request $request, $module_id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'status' => 'required|in:not_started,in_progress,blocked,completed',
+        ]);
+
+        $parent = ModuleModel::findOrFail($module_id);
+
+        ModuleModel::create([
+            'project_id'       => $parent->project_id,
+            'parent_module_id' => $parent->id,
+            'name'             => $request->name,
+            'description'      => $request->description,
+            'status'           => $request->status,
+        ]);
+
+        return back()->with('success', 'Sub-module created successfully');
+    }
+
+    public function moduleView($module_id) {
+        $module = ModuleModel::find($module_id);
+        $modules = ModuleModel::where('parent_module_id' , $module_id)
+            ->orderBy('created_at')
+            ->get();
+        return view('project_manager.projects.module.view'  , compact('module' , 'modules'));
+    }
+
 }
