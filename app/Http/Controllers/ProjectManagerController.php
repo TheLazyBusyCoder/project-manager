@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\ProjectModel;
 use App\Models\ModuleModel;
+use App\Models\TaskModel;
 use App\Models\User;
 use App\Project;
 use Illuminate\Http\Request;
@@ -398,10 +399,60 @@ class ProjectManagerController extends Controller
 
         $modules = ModuleModel::where('parent_module_id', $module_id)->get();
 
+        $developers = User::whereIn('role', ['developer', 'tester'])
+            ->where('manager_id', Auth::id())
+            ->get();
+
+        $tasks = TaskModel::where('module_id' , $module_id)->get();
+
         return view(
             'project_manager.projects.module.view',
-            compact('module', 'modules', 'treeData')
+            compact('module', 'modules', 'treeData' , 'developers' , 'tasks')
         );
+    }
+
+    public function viewTask($module_id, $task_id)
+    {
+        $module = ModuleModel::with('children')->findOrFail($module_id);
+
+        $task = TaskModel::with('taskComments')->where('id', $task_id)
+            ->where('module_id', $module_id)
+            ->firstOrFail();
+
+        $assigned_to = User::find($task->assigned_to);
+
+        return view(
+            'project_manager.projects.module.tasks.view',
+            compact('module', 'task', 'assigned_to')
+        );
+    }
+
+    public function taskStore(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'module_id'  => 'required|exists:modules,id',
+            'title'      => 'required|string|max:255',
+            'priority'   => 'required|in:low,medium,high,critical',
+            'status'     => 'required|in:todo,in_progress,code_review,done',
+        ]);
+
+        DB::table('tasks')->insert([
+            'project_id'      => $request->project_id,
+            'module_id'       => $request->module_id,
+            'assigned_to'     => $request->assigned_to,
+            'created_by'      => Auth::id(),
+            'title'           => $request->title,
+            'description'     => $request->description,
+            'priority'        => $request->priority,
+            'status'          => $request->status,
+            'estimated_hours' => $request->estimated_hours,
+            'due_date'        => $request->due_date,
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        return back()->with('success', 'Task created successfully');
     }
 
 

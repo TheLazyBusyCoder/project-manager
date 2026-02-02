@@ -95,6 +95,10 @@ Route::middleware(['auth'])->group(function () {
         });
 
         Route::get('/modules/{module_id}' , 'moduleView')->name('pm.modules.view');
+
+        Route::get('/pm/modules/{module_id}/tasks/{task_id}', [ProjectManagerController::class, 'viewTask'])->name('pm.tasks.view');
+        Route::post('/pm/tasks/store', [ProjectManagerController::class, 'taskStore'])->name('pm.tasks.store');
+
     });
 
 

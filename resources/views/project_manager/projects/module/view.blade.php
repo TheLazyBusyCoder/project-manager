@@ -14,7 +14,6 @@
 
 @section('main')
 
-
 <style>
     .container {
         max-width: 900px;
@@ -95,7 +94,9 @@
         <div class="tab active" data-tab="details">DETAILS</div>
         <div class="tab" data-tab="list">SUB MODULES</div>
         <div class="tab" data-tab="create">CREATE SUB MODULE</div>
+        <div class="tab" data-tab="tasks">TASKS</div>
         <div class="tab" data-tab="createTask">CREATE TASK</div>
+        <div class="tab" data-tab="viewDocumentation">DOCUMENTATION</div>
     </div>
 
     <hr>
@@ -157,7 +158,7 @@
             </tbody>
         </table>
     </div>
-    {{-- {{  dd($module) }} --}}
+    
     <div class="tab-content" id="create" style="display:none;">
         <form method="POST" action="{{ route('pm.modules.create.sub' , $module->id) }}">
             @csrf
@@ -195,6 +196,128 @@
             </div>
         </form>
     </div>
+
+    <div class="tab-content" id="tasks" style="display:none;" >
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Due Date</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($tasks as $task)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td><a href="{{ route('pm.tasks.view', ['task_id' => $task->id , 'module_id' => $module->id]) }}" >{{ $task->title }}</a></td>
+                        <td>{{ ucfirst($task->priority) }}</td>
+                        <td>{{ str_replace('_', ' ', ucfirst($task->status)) }}</td>
+                        <td>
+                            <a href="{{ $task->assignedUser->role == 'developer' ? route('pm.developer' , $task->assigned_to) : route('pm.tester' , $task->assigned_to) }}">{{ optional($task->assignedUser)->name ?? 'Unassigned' }}</a>
+                        </td>
+                        <td>
+                            {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d M Y') : '-' }}
+                        </td>
+                        <td>{{ $task->created_at->format('d M Y') }}</td>
+                        <td>
+                            <a href="{{ route('pm.tasks.view', ['task_id' => $task->id , 'module_id' => $module->id]) }}" class="btn">View</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8">No tasks created yet.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="tab-content" id="createTask" style="display:none;">
+        <form method="POST" action="{{ route('pm.tasks.store') }}">
+            @csrf
+
+            <input type="hidden" name="project_id" value="{{ $module->project_id }}">
+            <input type="hidden" name="module_id" value="{{ $module->id }}">
+
+            <table>
+                <tr>
+                    <td>Title</td>
+                    <td>
+                        <input type="text" name="title" class="btn" required style="width:100%">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Description</td>
+                    <td>
+                        <textarea name="description" rows="3" class="btn" style="width:100%"></textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Assign To</td>
+                    <td>
+                        <select name="assigned_to" class="btn" style="width:100%">
+                            <option value="">-- Unassigned --</option>
+                            @foreach($developers as $dev)
+                                <option value="{{ $dev->id }}">{{ $dev->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Priority</td>
+                    <td>
+                        <select name="priority" class="btn">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Status</td>
+                    <td>
+                        <select name="status" class="btn">
+                            <option value="todo" selected>To Do</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="code_review">Code Review</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Estimated Hours</td>
+                    <td>
+                        <input type="number" step="0.25" name="estimated_hours" class="btn">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Due Date</td>
+                    <td>
+                        <input type="date" name="due_date" class="btn">
+                    </td>
+                </tr>
+            </table>
+
+            <div class="actions">
+                <button class="btn">Create Task</button>
+            </div>
+        </form>
+    </div>
+
 </div>
 
 @endsection

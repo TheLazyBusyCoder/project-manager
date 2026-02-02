@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TaskModel extends Model
 {
@@ -21,4 +22,12 @@ class TaskModel extends Model
         'actual_hours',
         'due_date',
     ];
+
+    public function assignedUser() {
+        return $this->hasOne(User::class , 'id' , 'assigned_to');
+    }
+
+    public function taskComments() {
+        return $this->hasMany(TaskCommentsModel::class , 'id' , 'task_id');
+    }
 }
