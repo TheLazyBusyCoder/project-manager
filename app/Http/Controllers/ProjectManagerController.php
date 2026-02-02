@@ -271,21 +271,80 @@ class ProjectManagerController extends Controller
             ->with('success', 'Project created successfully');
     }
 
+    // private function moduleToJsTree($modules)
+    // {
+    //     return $modules->map(function ($module) {
+    //         return [
+    //             'id' => 'module_' . $module->id,
+    //             'text' => $module->name,
+    //             'a_attr' => [
+    //                 'href' => route('pm.modules.view', $module->id)
+    //             ],
+    //             // 'state' => ['opened' => true],
+    //             'children' => $this->moduleToJsTree($module->children)
+    //         ];
+    //     });
+    // }
+
+    private function moduleToJsTree($modules, $currentModuleId = -1)
+    {
+        return $modules->map(function ($module) use ($currentModuleId) {
+
+            $isCurrent = $module->id == $currentModuleId;
+
+            return [
+                'id' => 'module_' . $module->id,
+                'text' => $module->name,
+                'a_attr' => [
+                    'href' => route('pm.modules.view', $module->id)
+                ],
+                'state' => [
+                    'opened'   => $this->hasCurrentInTree($module, $currentModuleId),
+                    'selected' => $isCurrent
+                ],
+                'children' => $this->moduleToJsTree($module->children, $currentModuleId)
+            ];
+        });
+    }
+
+    private function hasCurrentInTree($module, $currentModuleId)
+    {
+        if ($module->id == $currentModuleId) {
+            return true;
+        }
+
+        foreach ($module->children as $child) {
+            if ($this->hasCurrentInTree($child, $currentModuleId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
     public function projectView($project_id)
     {
         $project = ProjectModel::findOrFail($project_id);
 
-        $modules = ModuleModel::with('parent')
-            ->where('project_id', $project_id)
-            ->where('parent_module_id' , null)
-            ->orderBy('created_at')
+        // Flat list (for table + select)
+        $modules = ModuleModel::where('project_id', $project_id)->where('parent_module_id' , null)->get();
+
+        // Tree (for sidebar)
+        $rootModules = ModuleModel::where('project_id', $project_id)
+            ->whereNull('parent_module_id')
+            ->with('children')
             ->get();
 
-        return view('project_manager.projects.view', compact(
-            'project',
-            'modules'
-        ));
+        $treeData = $this->moduleToJsTree($rootModules);
+
+        return view(
+            'project_manager.projects.view',
+            compact('project', 'modules', 'treeData')
+        );
     }
+
 
     public function moduleCreate(Request $request, $project_id)
     {
@@ -326,12 +385,24 @@ class ProjectManagerController extends Controller
         return back()->with('success', 'Sub-module created successfully');
     }
 
-    public function moduleView($module_id) {
-        $module = ModuleModel::find($module_id);
-        $modules = ModuleModel::where('parent_module_id' , $module_id)
-            ->orderBy('created_at')
+    public function moduleView($module_id)
+    {
+        $module = ModuleModel::with('children')->findOrFail($module_id);
+
+        $rootModules = ModuleModel::where('project_id', $module->project_id)
+            ->whereNull('parent_module_id')
+            ->with('children')
             ->get();
-        return view('project_manager.projects.module.view'  , compact('module' , 'modules'));
+
+        $treeData = $this->moduleToJsTree($rootModules, $module_id);
+
+        $modules = ModuleModel::where('parent_module_id', $module_id)->get();
+
+        return view(
+            'project_manager.projects.module.view',
+            compact('module', 'modules', 'treeData')
+        );
     }
+
 
 }

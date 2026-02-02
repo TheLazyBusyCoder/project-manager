@@ -24,7 +24,9 @@ class ModuleModel extends Model
 
     public function children()
     {
-        return $this->hasMany(ModuleModel::class, 'parent_module_id');
+        return $this->hasMany(ModuleModel::class, 'parent_module_id')
+                    ->with('children')
+                    ->orderBy('created_at');
     }
 
     public function parentModule()

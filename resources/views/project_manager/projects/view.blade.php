@@ -7,6 +7,10 @@
     <script src="{{asset('js/vis.min.js')}}"></script>
 @endsection
 
+@section('sidebar')
+    @include('partials.sidebar')
+@endsection
+
 @section('main')
 
 
@@ -85,19 +89,45 @@
 
 <div class="container">
 
-        Status: {{ $project->status }},
-        Project: {{ $project->name }} ( {{$project->start_date}} - {{$project->end_date}} ) <br>
-        Description: {{ $project->description }}
-
     <!-- Tabs -->
     <div class="tabs">
-        <div class="tab active" data-tab="list">MODULES</div>
-        <div class="tab " data-tab="create">CREATE</div>
+        <div class="tab active" data-tab="details">DETAILS</div>
+        <div class="tab" data-tab="list">SUB MODULES</div>
+        <div class="tab " data-tab="create">CREATE SUB MODULE</div>
     </div>
 
     <hr>
 
-    <div class="tab-content" id="list" >
+    <div class="tab-content" id="details" >
+        <table border="1" cellpadding="10" cellspacing="0" width="100%">
+            <thead>
+                <tr bgcolor="#f2f2f2">
+                    <th align="left">Property</th>
+                    <th align="left">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>Project Name</b></td>
+                    <td>{{ $project->name }}</td>
+                </tr>
+                <tr>
+                    <td><b>Dates</b></td>
+                    <td>{{$project->start_date}} - {{$project->end_date}}</td>
+                </tr>
+                <tr>
+                    <td><b>Status</b></td>
+                    <td>{{ $project->status }}</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Description</b></td>
+                    <td>{{ $project->description }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="list" style="display:none;">
         <table>
             <thead>
                 <tr>

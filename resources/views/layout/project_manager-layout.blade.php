@@ -19,7 +19,10 @@
         nav {
             background: #222;
             padding: 0 15px;
-            max-width: 900px;
+            /* max-width: 900px; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin: 0px auto;
             font-family: Arial, sans-serif;
             z-index: 9999;
@@ -101,10 +104,17 @@
 
         /* GRID LAYOUT */
         .layout {
-            max-width: 900px;
+            /* max-width: 900px; */
             margin: auto;
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns:  1fr 0.5fr;
+        }
+
+        .tree {
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: auto;
         }
 
         /* HISTORY */
@@ -160,18 +170,16 @@
         <div class="message">{{ session('success') }}</div>
     @endif
 
-    <div class="layout">
-        {{-- <aside class="history">
-            <h4>History</h4>
-            <a href="#">/projects/1</a>
-            <a href="#">/projects/2</a>
-            <a href="#">/projects</a>
-        </aside> --}}
+<div class="layout">
+    <main class="main">
+        @yield('main')
+    </main>
 
-        <main class="main">
-            @yield('main')
-        </main>
-    </div>
+    <aside class="tree">
+        @yield('sidebar')
+    </aside>
+</div>
+
 
     <script src="{{asset('js/base.js')}}"></script>
     @yield('script')

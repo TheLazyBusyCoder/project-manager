@@ -7,6 +7,11 @@
     <script src="{{asset('js/vis.min.js')}}"></script>
 @endsection
 
+@section('sidebar')
+    @include('partials.sidebar')
+@endsection
+
+
 @section('main')
 
 
@@ -83,21 +88,44 @@
     }
 </style>
 
-<div class="container">
-
-        Status: {{ $module->status }},
-        Module: {{ $module->name }} <br>
-        Description: {{ $module->description }}
+<div class="container">   
 
     <!-- Tabs -->
     <div class="tabs">
-        <div class="tab active" data-tab="list">MODULES</div>
-        <div class="tab " data-tab="create">CREATE</div>
+        <div class="tab active" data-tab="details">DETAILS</div>
+        <div class="tab" data-tab="list">SUB MODULES</div>
+        <div class="tab" data-tab="create">CREATE SUB MODULE</div>
+        <div class="tab" data-tab="createTask">CREATE TASK</div>
     </div>
 
     <hr>
 
-    <div class="tab-content" id="list" >
+    <div class="tab-content" id="details" >
+        <table border="1" cellpadding="10" cellspacing="0" width="100%">
+            <thead>
+                <tr bgcolor="#f2f2f2">
+                    <th align="left">Property</th>
+                    <th align="left">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>Module Name</b></td>
+                    <td>{{ $module->name }}</td>
+                </tr>
+                <tr>
+                    <td><b>Status</b></td>
+                    <td>{{ $module->status }}</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Description</b></td>
+                    <td>{{ $module->description }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="list" style="display:none;" >
         <table>
             <thead>
                 <tr>
