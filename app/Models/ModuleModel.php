@@ -34,4 +34,8 @@ class ModuleModel extends Model
         return $this->belongsTo(ModuleModel::class, 'parent_module_id');
     }
 
+    public function documentations() {
+        return $this->hasMany(ModuleDocumentationModel::class , 'module_id', 'id');
+    }
+
 }

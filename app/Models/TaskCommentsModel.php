@@ -12,4 +12,8 @@ class TaskCommentsModel extends Model
     public function user() {
         return $this->hasOne(User::class , 'id' , 'user_id');
     }
+
+    public function task() {
+        return $this->belongsTo(TaskModel::class , 'task_id' , 'id' );
+    }
 }

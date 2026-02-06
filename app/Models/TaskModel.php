@@ -23,11 +23,15 @@ class TaskModel extends Model
         'due_date',
     ];
 
+    public function module() {
+        return $this->belongsTo(ModuleModel::class , 'module_id' , 'id');
+    }
+
     public function assignedUser() {
         return $this->hasOne(User::class , 'id' , 'assigned_to');
     }
 
     public function taskComments() {
-        return $this->hasMany(TaskCommentsModel::class , 'id' , 'task_id');
+        return $this->hasMany(TaskCommentsModel::class , 'task_id' , 'id');
     }
 }

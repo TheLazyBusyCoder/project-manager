@@ -14,5 +14,7 @@ class ModuleDocumentationModel extends Model
         'title',
         'content',
         'version',
+        'created_at',
+        'updated_at'
     ];
 }

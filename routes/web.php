@@ -108,7 +108,12 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:developer'])->prefix('developer')->group(function () {
-        Route::get('/dashboard', [DeveloperController::class, 'dashboard']);
+        Route::get('/', [DeveloperController::class, 'dashboard'])->name('developer.dashboard');
+        Route::get('/tasks' , [DeveloperController::class, 'tasks'])->name('developer.tasks');
+        Route::get('/tasks/{task_id}' , [DeveloperController::class, 'viewTask'])->name('developer.tasks.view');
+        Route::post('/tasks/{task_id}/comment' , [DeveloperController::class, 'addComment'])->name('developer.tasks.comment');
+        Route::post('/modules/{module_id}/documentation' , [DeveloperController::class, 'addModuleDocumentation'])->name('developer.module.documentation');
+        Route::get('/documentation/{doc_id}' , [DeveloperController::class, 'viewDocumentation'])->name('developer.documentation.view');
     });
 
     /*
@@ -117,7 +122,7 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:tester'])->prefix('tester')->group(function () {
-        Route::get('/dashboard', [TesterController::class, 'dashboard']);
+        Route::get('/', [TesterController::class, 'dashboard']);
     });
 
 });
