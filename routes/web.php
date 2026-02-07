@@ -13,7 +13,7 @@ Route::get('/', function () {
     if(Auth::check()) {
         return match (Auth::user()->role) {
             'admin' => redirect()->to('/admin'),
-            'project_manager' => redirect()->to('/project-manager'),
+            'project_manager' => redirect()->to('/pm'),
             'developer' => redirect()->to('/developer'),
             'tester' => redirect()->to('/tester'),
             default => abort(403),
@@ -47,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->prefix('admin')->group(function () {
         Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::get('/project-managers', [AdminController::class, 'projectManagers'])->name('admin.project-managers');
-        Route::post('/project-managers', [AdminController::class, 'projectManagerAdd'])->name('admin.project-managers');
+        Route::post('/project-managers', [AdminController::class, 'projectManagerAdd'])->name('admin.project-managers.store');
     });
 
     /*
@@ -56,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:project_manager'])
-    ->prefix('project-manager')
+    ->prefix('pm')
     ->controller(ProjectManagerController::class)
     ->group(function () {
 
@@ -66,7 +66,7 @@ Route::middleware(['auth'])->group(function () {
         // Developers
         Route::prefix('developers')->group(function () {
             Route::get('/', 'developersIndex')->name('pm.developers');
-            Route::post('/', 'developersStore')->name('pm.developers');
+            Route::post('/', 'developersStore')->name('pm.developers.store');
             Route::put('/{developer_id}', 'developersUpdate')->name('pm.developers.update');
         });
         Route::prefix('developer')->group(function () {
@@ -77,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
         // Testers
         Route::prefix('testers')->group(function () {
             Route::get('/', 'testersIndex')->name('pm.testers');
-            Route::post('/', 'testersStore')->name('pm.testers');
+            Route::post('/', 'testersStore')->name('pm.testers.store');
             Route::put('/{tester_id}', 'testersUpdate')->name('pm.testers.update');
         });
         Route::prefix('tester')->group(function () {
@@ -94,14 +94,13 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/modules/sub/{module_id}', 'moduleCreateSub')->name('pm.modules.create.sub');
         });
 
+        Route::get('/modules/{module_id}/tasks/{task_id}', 'viewTask')->name('pm.tasks.view');
+
         Route::get('/modules/{module_id}' , 'moduleView')->name('pm.modules.view');
-        Route::get('/pm/modules/{module_id}/tasks/{task_id}', [ProjectManagerController::class, 'viewTask'])->name('pm.tasks.view');
-        Route::post('/pm/tasks/store', [ProjectManagerController::class, 'taskStore'])->name('pm.tasks.store');
-
-        Route::get('/pm/bugs/{bug_id}', [ProjectManagerController::class, 'bugsView'])
+        Route::post('tasks/store', 'taskStore')->name('pm.tasks.store');
+        Route::get('bugs/{bug_id}', 'bugsView')
         ->name('pm.bugs.view');
-
-        Route::post('/pm/bugs/{bug_id}/comment', [ProjectManagerController::class, 'addBugComment'])
+        Route::post('bugs/{bug_id}/comment', 'addBugComment')
         ->name('pm.bugs.comments.add');
     });
 

@@ -1,193 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <title>@yield('title') - Project Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {{-- Bootstrap --}}
+    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+
+    {{-- Base Theme --}}
     <link rel="stylesheet" href="{{ asset('css/base.css') }}">
 
     @yield('head')
-
-    {{-- Navbar --}}
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Navbar */
-        nav {
-            background: #222;
-            padding: 0 15px;
-            /* max-width: 900px; */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0px auto;
-            font-family: Arial, sans-serif;
-            z-index: 9999;
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            z-index: 9999;
-        }
-
-        nav > ul > li {
-            display: inline-block;
-            position: relative;
-            z-index: 9999;
-        }
-
-        nav a {
-            display: block;
-            padding: 12px 15px;
-            color: #fff;
-            text-decoration: none;
-            white-space: nowrap;
-            z-index: 9999;
-        }
-
-        nav a:hover {
-            background: #444;
-            z-index: 9999;
-        }
-
-        /* Dropdowns */
-        nav ul ul {
-            display: none;
-            position: absolute;
-            background: #333;
-            min-width: 180px;
-            top: 100%;
-            left: 0;
-            z-index: 9999;
-        }
-
-        nav ul ul li {
-            position: relative;
-            z-index: 9999;
-        }
-
-        nav ul li:hover > ul {
-            display: block;
-            z-index: 9999;
-        }
-
-        /* Nested dropdowns (right side) */
-        nav ul ul ul {
-            top: 0;
-            left: 100%;
-            z-index: 9999;
-        }
-
-    </style>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-
-        /* MESSAGE */
-        .message {
-            max-width: 900px;
-            margin: 10px auto;
-            background: #ebff7a;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        /* GRID LAYOUT */
-        .layout {
-            /* max-width: 900px; */
-            margin: auto;
-            display: grid;
-            grid-template-columns:  1fr 0.5fr;
-        }
-        .tree {
-            background: var(--bg-surface);
-            border-right: 1px solid var(--border-default);
-            padding: 10px;
-            overflow-y: auto;
-            color: var(--text-primary);
-        }
-
-        /* HISTORY */
-        .history {
-            background: var(--bg-surface);
-            font-size: 14px;
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        .history h4 {
-            margin-top: 0;
-            color: var(--text-primary);
-        }
-
-        .history a {
-            display: block;
-            color: var(--text-secondary);
-            text-decoration: none;
-            margin-bottom: 5px;
-            transition: color 0.2s ease, background-color 0.2s ease;
-        }
-
-        .history a:hover {
-            color: var(--accent-primary);
-            background-color: var(--bg-surface-hover);
-            text-decoration: none;
-        }
-
-
-    </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <ul>
-            <li><a href="{{route('pm.dashboard')}}">Dashboard</a></li>
+{{-- Navbar --}}
+<nav class="navbar navbar-expand-lg border-bottom">
+    <div class="container-fluid px-4">
 
-            <li>
-                <a href="#">Team</a>
-                <ul class="dropdown">
-                    <li><a href="{{route('pm.developers')}}">Developers</a></li>
-                    <li><a href="{{route('pm.testers')}}">Testers</a></li>
-                </ul>
-            </li>
+        <a class="navbar-brand" href="{{ route('pm.dashboard') }}">
+            Project Manager
+        </a>
 
-            <li><a href="{{route('pm.projects')}}">Projects</a></li>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#pmNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <li>
-                <form action="/logout" method="post">
-                    @csrf
-                    <button type="submit">Logout</button>
-                </form>
-            </li>
-        </ul>
-    </nav>
+        <div class="collapse navbar-collapse" id="pmNavbar">
+            <ul class="navbar-nav me-auto">
 
-    @if(session('success'))
-        <div class="message">{{ session('success') }}</div>
-    @endif
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('pm.dashboard') }}">
+                        Dashboard
+                    </a>
+                </li>
 
-<div class="layout">
-    <main class="main">
-        @yield('main')
-    </main>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Team
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('pm.developers') }}">
+                                Developers
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('pm.testers') }}">
+                                Testers
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
-    <aside class="tree">
-        @yield('sidebar')
-    </aside>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('pm.projects') }}">
+                        Projects
+                    </a>
+                </li>
+            </ul>
+
+            <form action="/logout" method="post">
+                @csrf
+                <button class="btn btn-outline-secondary btn-sm">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+{{-- Success Toast --}}
+@if(session('success'))
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast"
+         class="toast text-bg-success border-0"
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ session('success') }}
+            </div>
+            <button type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast">
+            </button>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- Main Layout --}}
+<div class="container-fluid px-4 my-4">
+    <div class="row g-3">
+
+        {{-- Main Content --}}
+        <main class="col-lg-8 col-xl-9">
+            @yield('main')
+        </main>
+
+        {{-- Sidebar --}}
+        <aside class="col-lg-4 col-xl-3">
+            @yield('sidebar')
+        </aside>
+
+    </div>
 </div>
 
+<script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-    <script src="{{asset('js/base.js')}}"></script>
-    @yield('script')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toastEl = document.getElementById('successToast');
+        if (toastEl) {
+            new bootstrap.Toast(toastEl, { delay: 3000 }).show();
+        }
+    });
+</script>
+
+@yield('script')
 </body>
-
 </html>

@@ -1,10 +1,9 @@
-@section('title', 'Developer Details')
+@section('title', 'Project Details')
 @extends('layout.project_manager-layout')
 
-
 @section('head')
-    <link rel="stylesheet" href="{{asset('css/vis.min.css')}}">
-    <script src="{{asset('js/vis.min.js')}}"></script>
+    <link rel="stylesheet" href="{{ asset('css/vis.min.css') }}">
+    <script src="{{ asset('js/vis.min.js') }}"></script>
 @endsection
 
 @section('sidebar')
@@ -13,208 +12,197 @@
 
 @section('main')
 
+<div class="container-fluid">
 
-<style>
-    .container {
-        max-width: 900px;
-        margin: 10px auto;
-        font-family: Arial, sans-serif;
-    }
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-0">{{ $project->name }}</h4>
+            <small class="text-muted">
+                {{ $project->start_date }} → {{ $project->end_date }}
+            </small>
+        </div>
 
-    h1 {
-        font-size: 22px;
-        margin-bottom: 10px;
-    }
-
-    p {
-        color: #555;
-        margin-bottom: 20px;
-    }
-
-    .card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-    }
-
-    .card h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .actions {
-        margin-bottom: 15px;
-        margin-top: 15px;
-    }
-
-    .btn {
-        padding: 6px 12px;
-        border: 1px solid #333;
-        background: #fff;
-        font-size: 13px;
-        margin-right: 5px;
-        text-decoration: none;
-        color: #333;
-    }
-
-    .btn:hover {
-        background: #f5f5f5;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
-
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    th {
-        background: #f9f9f9;
-    }
-
-    .status-active {
-        color: green;
-    }
-
-    .status-inactive {
-        color: red;
-    }
-</style>
-
-<div class="container">
-
-    <!-- Tabs -->
-    <div class="tabs">
-        <div class="tab active" data-tab="details">DETAILS</div>
-        <div class="tab" data-tab="list">SUB MODULES</div>
-        <div class="tab " data-tab="create">CREATE SUB MODULE</div>
+        <span class="badge bg-secondary">
+            {{ ucfirst(str_replace('_', ' ', $project->status)) }}
+        </span>
     </div>
 
-    <hr>
+    {{-- Tabs --}}
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#details"
+                    type="button">
+                Details
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#modules"
+                    type="button">
+                Sub Modules
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#create-module"
+                    type="button">
+                Create Module
+            </button>
+        </li>
+    </ul>
 
-    <div class="tab-content" id="details" >
-        <table border="1" cellpadding="10" cellspacing="0" width="100%">
-            <thead>
-                <tr bgcolor="#f2f2f2">
-                    <th align="left">Property</th>
-                    <th align="left">Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><b>Project Name</b></td>
-                    <td>{{ $project->name }}</td>
-                </tr>
-                <tr>
-                    <td><b>Dates</b></td>
-                    <td>{{$project->start_date}} - {{$project->end_date}}</td>
-                </tr>
-                <tr>
-                    <td><b>Status</b></td>
-                    <td>{{ $project->status }}</td>
-                </tr>
-                <tr>
-                    <td valign="top"><b>Description</b></td>
-                    <td>{{ $project->description }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <div class="tab-content">
 
-    <div class="tab-content" id="list" style="display:none;">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Parent</th>
-                    <th>Created</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($modules as $module)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $module->name }}</td>
-                        <td>{{ $module->status }}</td>
-                        <td>
-                            {{ optional($module->parent)->name ?? '-' }}
-                        </td>
-                        <td>{{ $module->created_at->format('d M Y') }}</td>
-                        <td>
-                            <a href="{{route('pm.modules.view' , ['module_id' => $module->id])}}" class="btn">View</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5">No modules created yet.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+        {{-- DETAILS --}}
+        <div class="tab-pane fade show active" id="details">
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3">Project Name</dt>
+                        <dd class="col-sm-9">{{ $project->name }}</dd>
 
-    <div class="tab-content" id="create" style="display:none;">
-        <form method="POST" action="{{ route('pm.modules.create', $project->id) }}">
-            @csrf
+                        <dt class="col-sm-3">Dates</dt>
+                        <dd class="col-sm-9">
+                            {{ $project->start_date }} – {{ $project->end_date }}
+                        </dd>
 
-            <table>
-                <tr>
-                    <td>Module Name</td>
-                    <td>
-                        <input type="text" name="name" class="btn" required style="width:100%">
-                    </td>
-                </tr>
+                        <dt class="col-sm-3">Status</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-secondary">
+                                {{ ucfirst(str_replace('_', ' ', $project->status)) }}
+                            </span>
+                        </dd>
 
-                <tr>
-                    <td>Description</td>
-                    <td>
-                        <textarea name="description" class="btn" rows="3" style="width:100%"></textarea>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Parent Module</td>
-                    <td>
-                        <select class="btn" name="parent_module_id" style="width:100%">
-                            <option value="">None</option>
-                            @foreach ($modules as $m)
-                                <option value="{{ $m->id }}">{{ $m->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Status</td>
-                    <td>
-                        <select class="btn" name="status">
-                            <option value="not_started">Not Started</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="blocked">Blocked</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-
-            <div class="actions">
-                <button class="btn">Create Module</button>
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9 text-muted">
+                            {{ $project->description }}
+                        </dd>
+                    </dl>
+                </div>
             </div>
-        </form>
+        </div>
+
+        {{-- MODULE LIST --}}
+        <div class="tab-pane fade" id="modules">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Parent</th>
+                                    <th>Created</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($modules as $module)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td class="fw-semibold">{{ $module->name }}</td>
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                {{ ucfirst(str_replace('_', ' ', $module->status)) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ optional($module->parent)->name ?? '-' }}</td>
+                                        <td>{{ $module->created_at->format('d M Y') }}</td>
+                                        <td class="text-end">
+                                            <a href="{{ route('pm.modules.view', $module->id) }}"
+                                               class="btn btn-sm btn-outline-primary">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6"
+                                            class="text-center text-muted py-4">
+                                            No modules created yet.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- CREATE MODULE --}}
+        <div class="tab-pane fade" id="create-module">
+            <div class="card">
+                <div class="card-body">
+
+                    <form method="POST"
+                          action="{{ route('pm.modules.create', $project->id) }}">
+                        @csrf
+
+                        <div class="mb-3">
+                            <label class="form-label">Module Name</label>
+                            <input type="text"
+                                   name="name"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description"
+                                      class="form-control"
+                                      rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Parent Module</label>
+                            <select name="parent_module_id"
+                                    class="form-select">
+                                <option value="">None</option>
+                                @foreach ($modules as $m)
+                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status"
+                                    class="form-select">
+                                <option value="not_started">Not Started</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="blocked">Blocked</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="text-end">
+                            <button class="btn btn-primary">
+                                Create Module
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="actions">
-        <a href="{{ route('pm.projects') }}" class="btn">Back</a>
+    <div class="mt-3">
+        <a href="{{ route('pm.projects') }}"
+           class="btn btn-outline-secondary">
+            ← Back to Projects
+        </a>
     </div>
+
 </div>
 
 @endsection

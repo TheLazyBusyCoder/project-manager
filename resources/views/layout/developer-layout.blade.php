@@ -4,165 +4,100 @@
     <meta charset="UTF-8">
     <title>@yield('title') - Project Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {{-- Bootstrap --}}
+    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+
+    {{-- Base Theme --}}
     <link rel="stylesheet" href="{{ asset('css/base.css') }}">
 
     @yield('head')
 
-    {{-- Navbar --}}
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Navbar */
-        nav {
-            background: #222;
-            padding: 0 15px;
-            /* max-width: 900px; */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0px auto;
-            font-family: Arial, sans-serif;
-            z-index: 9999;
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            z-index: 9999;
-        }
-
-        nav > ul > li {
-            display: inline-block;
-            position: relative;
-            z-index: 9999;
-        }
-
-        nav a {
-            display: block;
-            padding: 12px 15px;
-            color: #fff;
-            text-decoration: none;
-            white-space: nowrap;
-            z-index: 9999;
-        }
-
-        nav a:hover {
-            background: #444;
-            z-index: 9999;
-        }
-
-        /* Dropdowns */
-        nav ul ul {
-            display: none;
-            position: absolute;
-            background: #333;
-            min-width: 180px;
-            top: 100%;
-            left: 0;
-            z-index: 9999;
-        }
-
-        nav ul ul li {
-            position: relative;
-            z-index: 9999;
-        }
-
-        nav ul li:hover > ul {
-            display: block;
-            z-index: 9999;
-        }
-
-        /* Nested dropdowns (right side) */
-        nav ul ul ul {
-            top: 0;
-            left: 100%;
-            z-index: 9999;
-        }
-
-    </style>
-
-    <style>
-
-        /* MESSAGE */
-        .message {
-            max-width: 900px;
-            margin: 10px auto;
-            background: #ffffff;
-            text-align: center;
-            font-weight: bold;
-            color: black;
-        }
-
-        /* GRID LAYOUT */
-        .layout {
-            /* max-width: 900px; */
-            margin: auto;
-            display: grid;
-            grid-template-columns:  1fr;
-        }
-
-        .tree {
-            background: #fff;
-            border-right: 1px solid #ddd;
-            padding: 10px;
-            overflow-y: auto;
-        }
-
-        /* HISTORY */
-        .history {
-            background: #fff;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .history h4 {
-            margin-top: 0;
-        }
-
-        .history a {
-            display: block;
-            color: #555;
-            text-decoration: none;
-            margin-bottom: 5px;
-        }
-
-        .history a:hover {
-            text-decoration: underline;
-        }
-
-    </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <ul>
-            <li><a href="{{route('developer.dashboard')}}">Dashboard</a></li>
-            <li><a href="{{route('developer.tasks')}}">Tasks</a></li>
-            <li>
+    {{-- Navbar --}}
+    <nav class="navbar navbar-expand-lg border-bottom">
+        <div class="container-fluid px-4">
+
+            <a class="navbar-brand" href="{{ route('developer.dashboard') }}">
+                Project Manager
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#pmNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="pmNavbar">
+                <ul class="navbar-nav me-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('developer.dashboard') }}">
+                            Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('developer.tasks') }}">
+                            Tasks
+                        </a>
+                    </li>
+                </ul>
+
                 <form action="/logout" method="post">
                     @csrf
-                    <button type="submit">Logout</button>
+                    <button class="btn btn-outline-secondary btn-sm">
+                        Logout
+                    </button>
                 </form>
-            </li>
-        </ul>
+            </div>
+        </div>
     </nav>
 
+    {{-- Success Toast --}}
     @if(session('success'))
-        <div class="message">{{ session('success') }}</div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast"
+            class="toast text-bg-success border-0"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    {{ session('success') }}
+                </div>
+                <button type="button"
+                        class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast">
+                </button>
+            </div>
+        </div>
+    </div>
     @endif
 
-<div class="layout">
-    <main class="main">
-        @yield('main')
-    </main>
-</div>
 
+    {{-- Main Layout --}}
+    <div class="container-fluid px-4 my-4">
+        <div class="row g-3">
+            {{-- Main Content --}}
+            <main class="col">
+                @yield('main')
+            </main>
+        </div>
+    </div>
 
+    <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{asset('js/base.js')}}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toastEl = document.getElementById('successToast');
+            if (toastEl) {
+                new bootstrap.Toast(toastEl, { delay: 3000 }).show();
+            }
+        });
+    </script>
+    
     @yield('script')
 </body>
 

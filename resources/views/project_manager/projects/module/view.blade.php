@@ -1,403 +1,277 @@
 @section('title', 'Developer Details')
 @extends('layout.project_manager-layout')
 
-
 @section('head')
-    <link rel="stylesheet" href="{{asset('css/vis.min.css')}}">
-    <script src="{{asset('js/vis.min.js')}}"></script>
+<link rel="stylesheet" href="{{ asset('css/vis.min.css') }}">
+<script src="{{ asset('js/vis.min.js') }}"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
-/>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
-
 @endsection
 
 @section('sidebar')
-    @include('partials.sidebar')
+@include('partials.sidebar')
 @endsection
 
-
 @section('main')
+<div class="container py-3">
 
-<style>
-    .container {
-        max-width: 900px;
-        margin: 10px auto;
-        font-family: Arial, sans-serif;
-    }
+    {{-- Tabs --}}
+    <ul class="nav nav-tabs mb-3">
+        @foreach([
+            'details' => 'Details',
+            'list' => 'Sub Modules',
+            'create' => 'Create Sub Module',
+            'tasks' => 'Tasks',
+            'createTask' => 'Create Task',
+            'viewDocumentation' => 'Documentation',
+            'viewBugs' => 'Bugs'
+        ] as $id => $label)
+            <li class="nav-item">
+                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                        data-bs-toggle="tab"
+                        data-bs-target="#{{ $id }}">
+                    {{ $label }}
+                </button>
+            </li>
+        @endforeach
+    </ul>
 
-    h1 {
-        font-size: 22px;
-        margin-bottom: 10px;
-    }
+    <div class="tab-content">
 
-    p {
-        color: #555;
-        margin-bottom: 20px;
-    }
-
-    .card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-    }
-
-    .card h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .actions {
-        margin-bottom: 15px;
-        margin-top: 15px;
-    }
-
-    .btn {
-        padding: 6px 12px;
-        border: 1px solid #333;
-        background: #fff;
-        font-size: 13px;
-        margin-right: 5px;
-        text-decoration: none;
-        color: #333;
-    }
-
-    .btn:hover {
-        background: #f5f5f5;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
-
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    th {
-        background: #f9f9f9;
-    }
-
-    .status-active {
-        color: green;
-    }
-
-    .status-inactive {
-        color: red;
-    }
-</style>
-
-<div class="container">   
-
-    <!-- Tabs -->
-    <div class="tabs">
-        <div class="tab active" data-tab="details">DETAILS</div>
-        <div class="tab" data-tab="list">SUB MODULES</div>
-        <div class="tab" data-tab="create">CREATE SUB MODULE</div>
-        <div class="tab" data-tab="tasks">TASKS</div>
-        <div class="tab" data-tab="createTask">CREATE TASK</div>
-        <div class="tab" data-tab="viewDocumentation">DOCUMENTATION</div>
-        <div class="tab" data-tab="viewBugs">BUGS</div>
-    </div>
-
-    <hr>
-
-    <div class="tab-content" id="details" >
-        <table border="1" cellpadding="10" cellspacing="0" width="100%">
-            <thead>
-                <tr bgcolor="#f2f2f2">
-                    <th align="left">Property</th>
-                    <th align="left">Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><b>Module Name</b></td>
-                    <td>{{ $module->name }}</td>
-                </tr>
-                <tr>
-                    <td><b>Status</b></td>
-                    <td>{{ $module->status }}</td>
-                </tr>
-                <tr>
-                    <td valign="top"><b>Description</b></td>
-                    <td>{{ $module->description }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="tab-content" id="list" style="display:none;" >
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($modules as $child)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $child->name }}</td>
-                        <td>{{ $child->status }}</td>
-                        <td>{{ $child->created_at->format('d M Y') }}</td>
-                        <td>
-                            <a href="{{ route('pm.modules.view', $child->id) }}" class="btn">
-                                View
-                            </a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5">No modules created yet.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="tab-content" id="create" style="display:none;">
-        <form method="POST" action="{{ route('pm.modules.create.sub' , $module->id) }}">
-            @csrf
-
-            <table>
-                <tr>
-                    <td>Module Name</td>
-                    <td>
-                        <input type="text" name="name" class="btn" required style="width:100%">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Description</td>
-                    <td>
-                        <textarea name="description" class="btn" rows="3" style="width:100%"></textarea>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Status</td>
-                    <td>
-                        <select class="btn" name="status">
-                            <option value="not_started">Not Started</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="blocked">Blocked</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-
-            <div class="actions">
-                <button class="btn">Create Module</button>
+        {{-- DETAILS --}}
+        <div class="tab-pane fade show active" id="details">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-bordered mb-0">
+                        <tr><th>Module Name</th><td>{{ $module->name }}</td></tr>
+                        <tr><th>Status</th><td>{{ $module->status }}</td></tr>
+                        <tr><th>Description</th><td>{{ $module->description }}</td></tr>
+                    </table>
+                </div>
             </div>
-        </form>
-    </div>
-
-    <div class="tab-content" id="tasks" style="display:none;" >
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Title</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Assigned To</th>
-                    <th>Due Date</th>
-                    <th>Created</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($tasks as $task)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td><a href="{{ route('pm.tasks.view', ['task_id' => $task->id , 'module_id' => $module->id]) }}" >{{ $task->title }}</a></td>
-                        <td>{{ ucfirst($task->priority) }}</td>
-                        <td>{{ str_replace('_', ' ', ucfirst($task->status)) }}</td>
-                        <td>
-                            <a href="{{ $task->assignedUser->role == 'developer' ? route('pm.developer' , $task->assigned_to) : route('pm.tester' , $task->assigned_to) }}">{{ optional($task->assignedUser)->name ?? 'Unassigned' }}</a>
-                        </td>
-                        <td>
-                            {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d M Y') : '-' }}
-                        </td>
-                        <td>{{ $task->created_at->format('d M Y') }}</td>
-                        <td>
-                            <a href="{{ route('pm.tasks.view', ['task_id' => $task->id , 'module_id' => $module->id]) }}" class="btn">View</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8">No tasks created yet.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-    </div>
-
-    <div class="tab-content" id="createTask" style="display:none;">
-        <form method="POST" action="{{ route('pm.tasks.store') }}">
-            @csrf
-
-            <input type="hidden" name="project_id" value="{{ $module->project_id }}">
-            <input type="hidden" name="module_id" value="{{ $module->id }}">
-
-            <table>
-                <tr>
-                    <td>Title</td>
-                    <td>
-                        <input type="text" name="title" class="btn" required style="width:100%">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Description</td>
-                    <td>
-                        <textarea name="description" rows="3" class="btn" style="width:100%"></textarea>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Assign To</td>
-                    <td>
-                        <select name="assigned_to" class="btn" style="width:100%">
-                            <option value="">-- Unassigned --</option>
-                            @foreach($developers as $dev)
-                                <option value="{{ $dev->id }}">{{ $dev->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Priority</td>
-                    <td>
-                        <select name="priority" class="btn">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <option value="critical">Critical</option>
-                        </select>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Status</td>
-                    <td>
-                        <select name="status" class="btn">
-                            <option value="todo" selected>To Do</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="code_review">Code Review</option>
-                            <option value="done">Done</option>
-                        </select>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Estimated Hours</td>
-                    <td>
-                        <input type="number" step="0.25" name="estimated_hours" class="btn">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Due Date</td>
-                    <td>
-                        <input type="date" name="due_date" class="btn">
-                    </td>
-                </tr>
-            </table>
-
-            <div class="actions">
-                <button class="btn">Create Task</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="tab-content" id="viewDocumentation" style="display:none;">
-        @if ($documentation)
-            <p>Title: {{$documentation->title}}</p>
-            <p>Version: {{$documentation->version}}</p>
-            <div id="editor">
-            </div>
-        @else 
-            <p>No documentation has been created for this module</p>
-        @endif
-    </div>
-
-    <div class="tab-content" id="viewBugs" style="display:none;">
-        <div class="card">
-            <h3>Reported Bugs</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Severity</th>
-                        <th>Status</th>
-                        <th>Reporter</th>
-                        <th>Attachments</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($bugs as $bug)
-                        <tr>
-                            <td>{{ $bug->title }}</td>
-                            <td>{{ ucfirst($bug->severity) }}</td>
-                            <td>{{ ucfirst(str_replace('_',' ', $bug->status)) }}</td>
-                            <td>{{ optional($bug->reporter)->name ?? '—' }}</td>
-                            <td>
-                                @forelse($bug->attachments as $file)
-                                    <a href="{{ asset('storage/'.$file->file_path) }}" target="_blank">
-                                        {{ basename($file->file_path) }}
-                                    </a><br>
-                                @empty
-                                    —
-                                @endforelse
-                            </td>
-                            <td>
-                                <a href="{{route('pm.bugs.view' , $bug->id)}}" class="btn">View</a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4">No bugs reported.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
         </div>
+
+        {{-- SUB MODULES --}}
+        <div class="tab-pane fade" id="list">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Name</th><th>Status</th><th>Created</th><th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($modules as $child)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $child->name }}</td>
+                            <td>{{ $child->status }}</td>
+                            <td>{{ $child->created_at->format('d M Y') }}</td>
+                            <td>
+                                <a href="{{ route('pm.modules.view', $child->id) }}" class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="5" class="text-center">No modules created yet.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- CREATE SUB MODULE --}}
+        <div class="tab-pane fade" id="create">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{{ route('pm.modules.create.sub', $module->id) }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">Module Name</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="not_started">Not Started</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="blocked">Blocked</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-outline-secondary btn-sm">Create Module</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- TASKS --}}
+        <div class="tab-pane fade" id="tasks">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Title</th><th>Priority</th><th>Status</th>
+                            <th>Assigned To</th><th>Due</th><th>Created</th><th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($tasks as $task)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $task->title }}</td>
+                            <td>{{ ucfirst($task->priority) }}</td>
+                            <td>{{ str_replace('_',' ', ucfirst($task->status)) }}</td>
+                            <td>{{ optional($task->assignedUser)->name ?? 'Unassigned' }}</td>
+                            <td>{{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('d M Y') : '-' }}</td>
+                            <td>{{ $task->created_at->format('d M Y') }}</td>
+                            <td>
+                                <a href="{{ route('pm.tasks.view', [ $module->id , $task->id]) }}"
+                                   class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="8" class="text-center">No tasks created yet.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- CREATE TASK --}}
+        <div class="tab-pane fade" id="createTask">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{{ route('pm.tasks.store') }}">
+                        @csrf
+                        <input type="hidden" name="project_id" value="{{ $module->project_id }}">
+                        <input type="hidden" name="module_id" value="{{ $module->id }}">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Title</label>
+                                <input type="text" name="title" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Assign To</label>
+                                <select name="assigned_to" class="form-select">
+                                    <option value="">Unassigned</option>
+                                    @foreach($developers as $dev)
+                                        <option value="{{ $dev->id }}">{{ $dev->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="3"></textarea>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Priority</label>
+                                <select name="priority" class="form-select">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="todo">To Do</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="code_review">Code Review</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Due Date</label>
+                                <input type="date" name="due_date" class="form-control">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success mt-3">Create Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- DOCUMENTATION --}}
+        <div class="tab-pane fade" id="viewDocumentation">
+            @if ($documentation)
+                <p><strong>{{ $documentation->title }}</strong> (v{{ $documentation->version }})</p>
+                <div id="editor"></div>
+            @else
+                <p>No documentation has been created for this module.</p>
+            @endif
+        </div>
+
+        {{-- BUGS --}}
+        <div class="tab-pane fade" id="viewBugs">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Title</th><th>Severity</th><th>Status</th>
+                                <th>Reporter</th><th>Attachments</th><th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($bugs as $bug)
+                            <tr>
+                                <td>{{ $bug->title }}</td>
+                                <td>{{ ucfirst($bug->severity) }}</td>
+                                <td>{{ ucfirst(str_replace('_',' ', $bug->status)) }}</td>
+                                <td>{{ optional($bug->reporter)->name ?? '—' }}</td>
+                                <td>
+                                    @forelse($bug->attachments as $file)
+                                        <a href="{{ asset('storage/'.$file->file_path) }}" target="_blank">
+                                            {{ basename($file->file_path) }}
+                                        </a><br>
+                                    @empty — @endforelse
+                                </td>
+                                <td>
+                                    <a href="{{ route('pm.bugs.view', $bug->id) }}"
+                                       class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="6" class="text-center">No bugs reported.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
-
 </div>
-
 @endsection
 
 @section('script')
 <script>
-    const quill = new Quill('#editor', {
-        modules: {
-        syntax: true,
-        },
-        placeholder: 'Compose an epic...',
-        theme: 'snow',
-    });
-    quill.root.innerHTML = @json($documentation->content ?? '');
+const quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: { syntax: true }
+});
+quill.root.innerHTML = @json($documentation->content ?? '');
 </script>
 @endsection

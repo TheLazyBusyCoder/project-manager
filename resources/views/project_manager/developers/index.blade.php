@@ -1,172 +1,143 @@
-@section('title', 'PM')
+@section('title', 'PM Developers')
 @extends('layout.project_manager-layout')
 
 @section('main')
 
-<style>
-    .container {
-        max-width: 900px;
-        margin: 10px auto;
-        font-family: Arial, sans-serif;
-    }
+<div class="container-fluid">
 
-    h1 {
-        font-size: 22px;
-        margin-bottom: 10px;
-    }
+    <h4 class="mb-3">Developers</h4>
+    <p class="text-muted">Manage developers assigned to your projects.</p>
 
-    p {
-        color: #555;
-        margin-bottom: 20px;
-    }
+    {{-- Tabs --}}
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#developers-list"
+                    type="button">
+                Developers List
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#developers-create"
+                    type="button">
+                Create Developer
+            </button>
+        </li>
+    </ul>
 
-    .card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-    }
+    <div class="tab-content">
 
-    .card h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
+        {{-- LIST TAB --}}
+        <div class="tab-pane fade show active" id="developers-list">
 
-    .actions {
-        margin-bottom: 15px;
-    }
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($developers as $d)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $d->name }}</td>
+                                        <td>{{ $d->email }}</td>
+                                        <td>
+                                            <span class="badge {{ $d->status === 'active' ? 'bg-success' : 'bg-danger' }}">
+                                                {{ ucfirst($d->status) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $d->created_at?->format('d M Y') }}</td>
+                                        <td class="text-end">
+                                            <a href="{{ route('pm.developer', $d->id) }}"
+                                               class="btn btn-sm btn-outline-primary">
+                                                View
+                                            </a>
 
-    .btn {
-        padding: 6px 12px;
-        border: 1px solid #333;
-        background: #fff;
-        font-size: 13px;
-        margin-right: 5px;
-        text-decoration: none;
-        color: #333;
-    }
+                                            <form action="{{ route('pm.developer.delete', $d->id) }}"
+                                                  method="POST"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Are you sure?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            No developers found.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    .btn:hover {
-        background: #f5f5f5;
-    }
+        </div>
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
+        {{-- CREATE TAB --}}
+        <div class="tab-pane fade" id="developers-create">
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
+            <div class="card">
+                <div class="card-body">
 
-    th {
-        background: #f9f9f9;
-    }
+                    <form method="POST"
+                          action="{{ route('pm.developers.store') }}"
+                          onsubmit="return confirm('Create developer?')">
+                        @csrf
 
-    .status-active {
-        color: green;
-    }
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Name</label>
+                                <input type="text"
+                                       name="name"
+                                       class="form-control"
+                                       placeholder="Developer name"
+                                       required>
+                            </div>
 
-    .status-inactive {
-        color: red;
-    }
-</style>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email"
+                                       name="email"
+                                       class="form-control"
+                                       placeholder="Email address"
+                                       required>
+                            </div>
+                        </div>
 
-<div class="container">
-    <!-- Tabs -->
-    <div class="tabs">
-        <div class="tab active" data-tab="list">DEVELOPERS</div>
-        <div class="tab " data-tab="create">CREATE</div>
+                        <div class="text-end">
+                            <button class="btn btn-primary">
+                                Add Developer
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- Tab Contents -->
-    <div class="tab-content" id="list" >
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($developers as $d)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $d->name }}</td>
-                        <td>{{ $d->email }}</td>
-                        <td class="{{ $d->status === 'active' ? 'status-active' : 'status-inactive' }}">
-                            {{ ucfirst($d->status) }}
-                        </td>
-                        <td>{{ $d->created_at?->format('d M Y') ?? '' }}</td>
-                        <td>
-                            <a href="{{ route('pm.developer', $d->id) }}" class="btn">View</a>
-                            <form action="{{ route('pm.developer.delete', $d->id) }}"
-                                method="POST"
-                                style="display:inline;"
-                                onsubmit="return confirm('Are you sure you want to delete this developer?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6">No Developers found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="tab-content" id="create" style="display:none;">
-        <form method="post" action="{{ route('pm.developers') }}" autocomplete="off" onsubmit="return confirm('Are you sure?')">
-            @csrf
-
-            <table class="form-table">
-                <tr>
-                    <td><label>Name</label></td>
-                    <td>
-                        <input 
-                            type="text"
-                            name="name"
-                            placeholder="Name"
-                            autocomplete="none"
-                            class="btn"
-                            required
-                        >
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><label>Email</label></td>
-                    <td>
-                        <input 
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            autocomplete="new-email"
-                            class="btn"
-                            required
-                        >
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Action</td>
-                    <td>
-                         <button class="btn">Add Developer</button>
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
 </div>
+
 @endsection

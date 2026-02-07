@@ -2,107 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Project Manager Tool</title>
+    <title>Login - Project Manager Tool</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f7f7f7;
-            color: #333;
-        }
 
-        header {
-            background: #222;
-            color: #fff;
-            padding: 12px 20px;
-        }
+    {{-- Bootstrap --}}
+    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
 
-        main {
-            padding: 20px;
-        }
-
-        h1, h2 {
-            margin-top: 0;
-        }
-
-        .card {
-            background: #fff;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-        }
-
-        ul {
-            padding-left: 18px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 10px;
-            font-size: 12px;
-            color: #777;
-        }
-    </style>
-    {{-- Form CSS --}}
-    <style>
-        input, select, button {
-            padding: 6px;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        .form {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
+    {{-- Base Theme --}}
+    <link rel="stylesheet" href="{{ asset('css/base.css') }}">
 </head>
 <body>
 
-<header>
-    <h1>Project Manager Tool</h1>
-    <p>Simple. Structured. Scalable.</p>
-</header>
+<div class="min-vh-100 d-flex align-items-center justify-content-center">
 
-<main>
-    <div class="card">
-        <div class="form">
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+    <div class="col-11 col-sm-8 col-md-5 col-lg-4">
 
-                <h2>Login</h2>
+        <div class="card">
+            <div class="card-body p-4">
 
-                @error('email')
-                    <p style="color:red">{{ $message }}</p>
-                @enderror
+                <div class="text-center mb-4">
+                    <h1 class="h4 fw-bold mb-1">Project Manager</h1>
+                    <p class="text-muted mb-0">
+                        Simple. Structured. Scalable.
+                    </p>
+                </div>
 
-                <input 
-                    type="email" 
-                    name="email" 
-                    placeholder="Email"
-                    value="{{ old('email') }}"
-                    required
-                >
-                <br>
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
 
-                <input 
-                    type="password" 
-                    name="password" 
-                    placeholder="Password"
-                    required
-                >
-                <br>
+                    {{-- Email --}}
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            class="form-control"
+                            placeholder="you@example.com"
+                            value="{{ old('email') }}"
+                            required
+                        >
+                        @error('email')
+                            <div class="text-danger small mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
 
-                <button type="submit">Login</button>
-            </form>
+                    {{-- Password --}}
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+
+                    {{-- Submit --}}
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            Login
+                        </button>
+                    </div>
+                </form>
+
+            </div>
         </div>
+
+        <p class="text-center text-muted small mt-3">
+            © 2026 Project Manager Tool
+        </p>
+
     </div>
-</main>
+</div>
 
-<footer>
-    © 2026 Project Manager Tool
-</footer>
-
+<script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 </body>
 </html>

@@ -1,23 +1,22 @@
+{{-- jstree styles --}}
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/jstree/dist/themes/default/style.min.css">
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-      <style>
-.jstree-search {
-    color: #22c55e !important;
-    font-weight: 600;
-}
-</style>
+<div class="card h-100">
+    <div class="card-body p-3">
 
+        <input
+            type="text"
+            id="tree-search"
+            class="form-control form-control-sm mb-3"
+            placeholder="Search modules..."
+        >
 
-<input
-    type="text"
-    id="tree-search"
-    placeholder="Search modules..."
-    style="width:100%; padding:8px; margin-bottom:10px;"
->
-<div id="modules-tree"></div>
+        <div id="modules-tree"></div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jstree/dist/jstree.min.js"></script>
@@ -33,15 +32,15 @@ $('#modules-tree').jstree({
         }
     },
     types: {
-        default: { icon: 'fa fa-folder text-yellow-400' },
-        file: { icon: 'fa fa-file text-blue-400' }
+        default: { icon: 'fa fa-folder text-warning' },
+        file: { icon: 'fa fa-file text-primary' }
     },
     search: {
         case_sensitive: false,
         show_only_matches: true,
         show_only_matches_children: true
     },
-    plugins: ['types', 'wholerow' , 'search']
+    plugins: ['types', 'wholerow', 'search']
 });
 
 $('#modules-tree').on('select_node.jstree', function (e, data) {
@@ -50,14 +49,10 @@ $('#modules-tree').on('select_node.jstree', function (e, data) {
 });
 
 let to = false;
-
-$('#tree-search').keyup(function () {
-    if (to) {
-        clearTimeout(to);
-    }
-    to = setTimeout(function () {
-        const v = $('#tree-search').val();
-        $('#modules-tree').jstree(true).search(v);
+$('#tree-search').on('keyup', function () {
+    clearTimeout(to);
+    to = setTimeout(() => {
+        $('#modules-tree').jstree(true).search(this.value);
     }, 250);
 });
 </script>

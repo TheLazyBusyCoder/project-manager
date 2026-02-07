@@ -1,166 +1,170 @@
-@section('title', 'PM')
+@section('title', 'PM Projects')
 @extends('layout.project_manager-layout')
 
 @section('main')
 
-<style>
+    <div class="container-fluid">
 
-    /* Form styling */
-    .tab-content input,
-    .tab-content textarea,
-    .tab-content select,
-    .tab-content {
-        padding: 6px 8px;
-        margin-bottom: 8px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-        transition: all 0.1s;
-    }
+        <h4 class="mb-3">Projects</h4>
+        <p class="text-muted">Manage and track all your projects.</p>
 
-    .tab-content input:focus,
-    .tab-content textarea:focus,
-    .tab-content select:focus {
-        outline: none;
-        border-color: #5b7df0;
-        box-shadow: 0 0 2px rgba(91, 125, 240, 0.2);
-    }
+        {{-- Tabs --}}
+        <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active"
+                        data-bs-toggle="tab"
+                        data-bs-target="#projects-list"
+                        type="button">
+                    Projects List
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#projects-create"
+                        type="button">
+                    Create Project
+                </button>
+            </li>
+        </ul>
 
-    .tab-content textarea {
-        resize: vertical;
-    }
+        <div class="tab-content">
 
-    .btn {
-        padding: 6px 12px;
-        border: 1px solid #333;
-        background: #fff;
-        font-size: 13px;
-        margin-right: 5px;
-        text-decoration: none;
-        color: #333;
-    }
+            {{-- LIST TAB --}}
+            <div class="tab-pane fade show active" id="projects-list">
 
-    .btn:hover {
-        background: #f5f5f5;
-    }
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($projects as $p)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td class="fw-semibold">{{ $p->name }}</td>
+                                            <td class="text-muted">{{ $p->description }}</td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    {{ ucfirst(str_replace('_', ' ', $p->status)) }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $p->created_at?->format('d M Y') }}</td>
+                                            <td class="text-end">
+                                                <a href="{{ route('pm.project.view', ['project_id' => $p->id]) }}"
+                                                class="btn btn-sm btn-outline-primary">
+                                                    View
+                                                </a>
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
+                                                <form method="POST"
+                                                    action=""
+                                                    class="d-inline"
+                                                    onsubmit="return confirm('Delete this project?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                No projects found.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
+            </div>
 
-    th {
-        background: #f9f9f9;
-        width: 200px;
-    }
-</style>
+            {{-- CREATE TAB --}}
+            <div class="tab-pane fade" id="projects-create">
 
-<div class="container">
-    <!-- Tabs -->
-    <div class="tabs">
-        <div class="tab active" data-tab="list">PROJECTS</div>
-        <div class="tab " data-tab="create">CREATE</div>
+                <div class="card">
+                    <div class="card-body">
+
+                        <form method="POST"
+                            action="{{ route('pm.projects.create') }}"
+                            onsubmit="return confirm('Create this project?')">
+                            @csrf
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Project Name</label>
+                                    <input type="text"
+                                        name="name"
+                                        class="form-control"
+                                        required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Status</label>
+                                    <select name="status"
+                                            class="form-select"
+                                            required>
+                                        <option value="planned">Planned</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="on_hold">On Hold</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description"
+                                        class="form-control"
+                                        rows="3"></textarea>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date"
+                                        name="start_date"
+                                        class="form-control"
+                                        required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date"
+                                        name="end_date"
+                                        class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="text-end">
+                                <button class="btn btn-primary">
+                                    Add Project
+                                </button>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-    <!-- Tab Contents -->
-    <div class="tab-content" id="list" >
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($projects as $p)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $p->name }}</td>
-                        <td>{{ $p->description }}</td>
-                        <td>{{$p->status }}</td>
-                        <td>{{ $p->created_at?->format('d M Y') ?? '' }}</td>
-                        <td>
-                            <a href="{{route('pm.project.view' , ['project_id' => $p->id])}}" class="btn">View</a>
-                            <form method="POST" action="" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn" onclick="return confirm('Delete this project?')">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6">No Projects found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
 
-    <div class="tab-content" id="create" style="display:none;">
-        <form method="POST" action="{{ route('pm.projects.create') }}" autocomplete="off"
-            onsubmit="return confirm('Create this project?')">
-            @csrf
-
-            <table class="form-table">
-                <tr>
-                    <td><label>Project Name</label></td>
-                    <td>
-                        <input type="text" name="name" required>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><label>Description</label></td>
-                    <td>
-                        <textarea name="description" rows="3"></textarea>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><label>Status</label></td>
-                    <td>
-                        <select name="status" required>
-                            <option value="planned">planned</option>
-                            <option value="in_progress">in_progress</option>
-                            <option value="on_hold">on_hold</option>
-                            <option value="completed">completed</option>
-                            <option value="cancelle">cancelle</option>
-                        </select>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><label>Start Date</label></td>
-                    <td>
-                        <input type="date" name="start_date" required>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><label>End Date</label></td>
-                    <td>
-                        <input type="date" name="end_date">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Action</td>
-                    <td>
-                        <button class="btn" type="submit">Add Project</button>
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
-
-</div>
 @endsection

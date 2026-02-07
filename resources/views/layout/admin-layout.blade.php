@@ -1,137 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <title>@yield('title') - Project Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {{-- Navbar --}}
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+    {{-- Bootstrap --}}
+    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
 
-        /* Navbar */
-        nav {
-            background: #222;
-            padding: 0 15px;
-            max-width: 900px;
-            margin: 0px auto;
-            font-family: Arial, sans-serif;
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        nav > ul > li {
-            display: inline-block;
-            position: relative;
-        }
-
-        nav a {
-            display: block;
-            padding: 12px 15px;
-            color: #fff;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        nav a:hover {
-            background: #444;
-        }
-
-        /* Dropdowns */
-        nav ul ul {
-            display: none;
-            position: absolute;
-            background: #333;
-            min-width: 180px;
-            top: 100%;
-            left: 0;
-        }
-
-        nav ul ul li {
-            position: relative;
-        }
-
-        nav ul li:hover > ul {
-            display: block;
-        }
-
-        /* Nested dropdowns (right side) */
-        nav ul ul ul {
-            top: 0;
-            left: 100%;
-        }
-
-    </style>
-
-    {{-- Main --}}
-    <style>
-        .main {
-            max-width: 900px;
-            margin: 0px auto;
-            font-family: Arial, sans-serif;
-            padding: 10px;
-        }
-    </style>
-
-    {{-- Message --}}
-    <style>
-        .message { 
-            max-width: 900px;
-            margin: 0px auto;
-            font-family: Arial, sans-serif;
-            padding: 5px 15px;
-            font-weight: bold;
-            background-color: rgb(235, 255, 122);
-            text-align: center;
-        }
-    </style>
+    {{-- Base Theme --}}
+    <link rel="stylesheet" href="{{ asset('css/base.css') }}">
 </head>
 <body>
 
-<nav>
-    <ul>
+{{-- Navbar --}}
+<nav class="navbar navbar-expand-lg border-bottom">
+    <div class="container">
 
-        <!-- Dashboard -->
-        <li>
-            <a href="{{route('admin.dashboard')}}">Dashboard</a>
-        </li>
+        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
+            Project Manager
+        </a>
 
-        <!-- User Management -->
-        <li>
-            <a href="#">User Management</a>
-            <ul>
-                <!-- Project Managers -->
-                <li>
-                    <a href="{{route('admin.project-managers')}}">Project Managers</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="adminNavbar">
+            <ul class="navbar-nav me-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Users
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.project-managers') }}">
+                                Project Managers
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
-        </li>
 
-        <!-- Logout -->
-        <li>
-            <form action="/logout" method="post">
+            {{-- Logout --}}
+            <form action="/logout" method="post" class="d-flex">
                 @csrf
-                <button type="submit">Logout</button>
+                <button class="btn btn-outline-secondary btn-sm" type="submit">
+                    Logout
+                </button>
             </form>
-        </li>
-
-    </ul>
+        </div>
+    </div>
 </nav>
 
 @if(session('success'))
-<p class="message">{{session('success')}}</p>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast"
+         class="toast align-items-center text-bg-success border-0"
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ session('success') }}
+            </div>
+            <button type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast"
+                    aria-label="Close">
+            </button>
+        </div>
+    </div>
+</div>
 @endif
 
-<div class="main">
-    @yield('main')
-</div>
 
+{{-- Main --}}
+<main class="container my-4">
+    @yield('main')
+</main>
+<script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toastEl = document.getElementById('successToast');
+        if (toastEl) {
+            const toast = new bootstrap.Toast(toastEl, {
+                delay: 3000
+            });
+            toast.show();
+        }
+    });
+</script>
 </body>
 </html>
