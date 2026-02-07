@@ -1,7 +1,7 @@
 
 
-@section('title' , 'Developer')
-@extends('layout.developer-layout')
+@section('title' , 'Tester')
+@extends('layout.tester-layout')
 
 @section('head')
 
@@ -141,7 +141,7 @@
         </table>
 
         <div class="form">
-            <form method="POST" action="{{ route('developer.tasks.comment' , $task->id) }}">
+            <form method="POST" action="{{ route('tester.tasks.comment' , $task->id) }}">
                 @csrf
                 <input 
                     type="text" 
@@ -180,8 +180,8 @@
 
     <div class="tab-content" id="module" style="display: none;" >
         <div>
-            <a class="btn" target="_blank" href="{{route('developer.project.view' , $task->module->project_id)}}">View Full Project</a>
-            <a class="btn" target="_blank" href="{{route('developer.documentation.view' , $task->module->documentation->id)}}">View Documentation</a>
+            <a class="btn" target="_blank" href="{{route('tester.project.view' , $task->module->project_id)}}">View Full Project</a>
+            <a class="btn" target="_blank" href="{{route('tester.documentation.view' , $task->module->documentation->id)}}">View Documentation</a>
         </div>
 
         <table border="1" cellpadding="10" cellspacing="0" width="100%">
@@ -208,76 +208,78 @@
         </table>
 
         <div class="form">
-            <form id="docForm" method="POST" action="{{ route('developer.module.documentation' , $task->module->id) }}">
-                @csrf
+            <form id="docForm">
                 <input 
                     type="text" 
                     name="title" 
                     placeholder="Title"
                     value="{{$task->module->documentation->title}}"
-                    required
+                    readonly
                 >
                 <input 
                     type="text" 
                     name="version" 
                     placeholder="Version"
                     value="{{$task->module->documentation->version}}"
-                    required
+                    readonly
                 >
-                <button type="submit">Update Documentation</button>
-                <div id="toolbar-container">
-                    <span class="ql-formats">
-                        <select class="ql-font"></select>
-                        <select class="ql-size"></select>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-bold"></button>
-                        <button class="ql-italic"></button>
-                        <button class="ql-underline"></button>
-                        <button class="ql-strike"></button>
-                    </span>
-                    <span class="ql-formats">
-                        <select class="ql-color"></select>
-                        <select class="ql-background"></select>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-script" value="sub"></button>
-                        <button class="ql-script" value="super"></button>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-header" value="1"></button>
-                        <button class="ql-header" value="2"></button>
-                        <button class="ql-blockquote"></button>
-                        <button class="ql-code-block"></button>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-list" value="ordered"></button>
-                        <button class="ql-list" value="bullet"></button>
-                        <button class="ql-indent" value="-1"></button>
-                        <button class="ql-indent" value="+1"></button>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-direction" value="rtl"></button>
-                        <select class="ql-align"></select>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-link"></button>
-                        <button class="ql-image"></button>
-                        <button class="ql-video"></button>
-                        <button class="ql-formula"></button>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-clean"></button>
-                    </span>
-                    </div>
                 <div id="editor">
                 </div>
-                <input type="hidden" name="content" id="content">
             </form>
         </div>
     </div>
 
-    <div class="tab-content" id="bugs" style="display: none;" >
+    <div class="tab-content" id="bugs" style="display: none;">
+        <!-- Add Bug -->
+        <div class="card">
+            <h3>Report Bug</h3>
+            <form method="POST" 
+                action="{{ route('tester.bugs.store') }}" 
+                enctype="multipart/form-data">
+
+                @csrf
+
+                <input type="hidden" name="project_id" value="{{ $task->module->project_id }}">
+                <input type="hidden" name="module_id" value="{{ $task->module->id }}">
+
+                <div class="actions">
+                    <input class="form-control" name="title" placeholder="Bug title" required>
+                </div>
+
+                <div class="actions">
+                    <textarea class="form-control" name="description" placeholder="Description"></textarea>
+                    <textarea class="form-control" name="steps_to_reproduce" placeholder="Steps to reproduce"></textarea>
+                </div>
+
+                <div class="actions">
+                    <select name="severity" class="form-control">
+                        <option value="minor">Minor</option>
+                        <option value="major">Major</option>
+                        <option value="critical">Critical</option>
+                        <option value="blocker">Blocker</option>
+                    </select>
+
+                    <select name="assigned_to" class="form-control">
+                        <option value="">Unassigned</option>
+                        @foreach($developers as $dev)
+                            <option value="{{ $dev->id }}">{{ $dev->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- 🔥 Attachments -->
+                <div class="actions">
+                    <input type="file" 
+                        name="attachments[]" 
+                        multiple 
+                        class="form-control">
+                    <small>Attach screenshots, logs, or files</small>
+                </div>
+
+                <button class="btn">Report Bug</button>
+            </form>
+        </div>
+        <!-- Bug List -->
         <div class="card">
             <h3>Reported Bugs</h3>
             <table>
@@ -286,18 +288,18 @@
                         <th>Title</th>
                         <th>Severity</th>
                         <th>Status</th>
-                        <th>Reporter</th>
+                        <th>Assigned</th>
                         <th>Attachments</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($task->module->bugs->where('assigned_to' , Auth::user()->id) as $bug)
+                    @forelse($task->module->bugs as $bug)
                         <tr>
                             <td>{{ $bug->title }}</td>
                             <td>{{ ucfirst($bug->severity) }}</td>
                             <td>{{ ucfirst(str_replace('_',' ', $bug->status)) }}</td>
-                            <td>{{ optional($bug->reporter)->name ?? '—' }}</td>
+                            <td>{{ optional($bug->assignee)->name ?? '—' }}</td>
                             <td>
                                 @forelse($bug->attachments as $file)
                                     <a href="{{ asset('storage/'.$file->file_path) }}" target="_blank">
@@ -308,7 +310,7 @@
                                 @endforelse
                             </td>
                             <td>
-                                <a href="{{route('developer.bugs.view' , $bug->id)}}" class="btn">View</a>
+                                <a href="{{route('tester.bugs.view' , $bug->id)}}" class="btn">View</a>
                             </td>
                         </tr>
                     @empty
@@ -335,8 +337,5 @@
         theme: 'snow',
     });
     quill.root.innerHTML = @json($task->module->documentation->content ?? '');
-    document.querySelector('#docForm').addEventListener('submit', function () {
-        document.getElementById('content').value = quill.root.innerHTML;
-    });
 </script>
 @endsection

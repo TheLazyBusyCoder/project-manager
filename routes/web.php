@@ -95,10 +95,14 @@ Route::middleware(['auth'])->group(function () {
         });
 
         Route::get('/modules/{module_id}' , 'moduleView')->name('pm.modules.view');
-
         Route::get('/pm/modules/{module_id}/tasks/{task_id}', [ProjectManagerController::class, 'viewTask'])->name('pm.tasks.view');
         Route::post('/pm/tasks/store', [ProjectManagerController::class, 'taskStore'])->name('pm.tasks.store');
 
+        Route::get('/pm/bugs/{bug_id}', [ProjectManagerController::class, 'bugsView'])
+        ->name('pm.bugs.view');
+
+        Route::post('/pm/bugs/{bug_id}/comment', [ProjectManagerController::class, 'addBugComment'])
+        ->name('pm.bugs.comments.add');
     });
 
 
@@ -114,6 +118,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/tasks/{task_id}/comment' , [DeveloperController::class, 'addComment'])->name('developer.tasks.comment');
         Route::post('/modules/{module_id}/documentation' , [DeveloperController::class, 'addModuleDocumentation'])->name('developer.module.documentation');
         Route::get('/documentation/{doc_id}' , [DeveloperController::class, 'viewDocumentation'])->name('developer.documentation.view');
+        Route::get('/project/{project_id}' , [DeveloperController::class , 'viewProjectTree'])->name('developer.project.view');
+
+        Route::get('/bugs/{bug_id}', [DeveloperController::class, 'bugsView'])
+        ->name('developer.bugs.view');
+        Route::post('/bugs/{bug_id}/comment', [DeveloperController::class, 'addBugComment'])
+        ->name('developer.bugs.comments.add');
     });
 
     /*
@@ -122,7 +132,21 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:tester'])->prefix('tester')->group(function () {
-        Route::get('/', [TesterController::class, 'dashboard']);
+        Route::get('/', [TesterController::class, 'dashboard'])->name('tester.dashboard');
+        Route::get('/tasks' , [TesterController::class, 'tasks'])->name('tester.tasks');
+        Route::get('/tasks/{task_id}' , [TesterController::class, 'viewTask'])->name('tester.tasks.view');
+        Route::post('/tasks/{task_id}/comment' , [TesterController::class, 'addComment'])->name('tester.tasks.comment');
+        Route::get('/documentation/{doc_id}' , [TesterController::class, 'viewDocumentation'])->name('tester.documentation.view');
+        Route::get('/project/{project_id}' , [TesterController::class , 'viewProjectTree'])->name('tester.project.view');
+
+        Route::post('/bugs/store', [TesterController::class, 'bugsStore'])
+        ->name('tester.bugs.store');
+
+        Route::get('/bugs/{bug_id}', [TesterController::class, 'bugsView'])
+        ->name('tester.bugs.view');
+
+        Route::post('/bugs/{bug_id}/comment', [TesterController::class, 'addBugComment'])
+        ->name('tester.bugs.comments.add');
     });
 
 });

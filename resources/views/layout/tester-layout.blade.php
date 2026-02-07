@@ -86,19 +86,15 @@
     </style>
 
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
 
         /* MESSAGE */
         .message {
             max-width: 900px;
             margin: 10px auto;
-            background: #ebff7a;
+            background: #ffffff;
             text-align: center;
             font-weight: bold;
+            color: black;
         }
 
         /* GRID LAYOUT */
@@ -106,43 +102,37 @@
             /* max-width: 900px; */
             margin: auto;
             display: grid;
-            grid-template-columns:  1fr 0.5fr;
+            grid-template-columns:  1fr;
         }
+
         .tree {
-            background: var(--bg-surface);
-            border-right: 1px solid var(--border-default);
+            background: #fff;
+            border-right: 1px solid #ddd;
             padding: 10px;
             overflow-y: auto;
-            color: var(--text-primary);
         }
 
         /* HISTORY */
         .history {
-            background: var(--bg-surface);
+            background: #fff;
             font-size: 14px;
             text-align: center;
-            color: var(--text-secondary);
         }
 
         .history h4 {
             margin-top: 0;
-            color: var(--text-primary);
         }
 
         .history a {
             display: block;
-            color: var(--text-secondary);
+            color: #555;
             text-decoration: none;
             margin-bottom: 5px;
-            transition: color 0.2s ease, background-color 0.2s ease;
         }
 
         .history a:hover {
-            color: var(--accent-primary);
-            background-color: var(--bg-surface-hover);
-            text-decoration: none;
+            text-decoration: underline;
         }
-
 
     </style>
 </head>
@@ -150,18 +140,8 @@
 
     <nav class="navbar">
         <ul>
-            <li><a href="{{route('pm.dashboard')}}">Dashboard</a></li>
-
-            <li>
-                <a href="#">Team</a>
-                <ul class="dropdown">
-                    <li><a href="{{route('pm.developers')}}">Developers</a></li>
-                    <li><a href="{{route('pm.testers')}}">Testers</a></li>
-                </ul>
-            </li>
-
-            <li><a href="{{route('pm.projects')}}">Projects</a></li>
-
+            <li><a href="{{route('tester.dashboard')}}">Dashboard</a></li>
+            <li><a href="{{route('tester.tasks')}}">Tasks</a></li>
             <li>
                 <form action="/logout" method="post">
                     @csrf
@@ -179,10 +159,6 @@
     <main class="main">
         @yield('main')
     </main>
-
-    <aside class="tree">
-        @yield('sidebar')
-    </aside>
 </div>
 
 

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\BugCommentModel;
+use App\Models\ModuleDocumentationModel;
 use App\Models\ProjectModel;
+use App\Models\BugModel;
 use App\Models\ModuleModel;
 use App\Models\TaskModel;
 use App\Models\User;
@@ -405,9 +408,13 @@ class ProjectManagerController extends Controller
 
         $tasks = TaskModel::where('module_id' , $module_id)->get();
 
+        $documentation = ModuleDocumentationModel::where('module_id' , $module_id)->first();
+
+        $bugs = BugModel::where('module_id' , $module_id)->get();
+
         return view(
             'project_manager.projects.module.view',
-            compact('module', 'modules', 'treeData' , 'developers' , 'tasks')
+            compact('module', 'modules', 'treeData' , 'developers' , 'tasks' , 'documentation' , 'bugs')
         );
     }
 
@@ -455,5 +462,16 @@ class ProjectManagerController extends Controller
         return back()->with('success', 'Task created successfully');
     }
 
+    public function bugsView($bug_id) {
+        $bug = BugModel::
+        with(['comments' , 'attachments' , 'assignee'])->
+        find($bug_id);
+        return view('project_manager.bugs.view' , compact('bug'));
+    }
 
+    public function addBugComment(Request $request , $bug_id) {
+        $comment = $request->input('comment');
+        BugCommentModel::insert(['bug_id' => $bug_id, 'comment' => $comment , 'user_id' => Auth::user()->id]);
+        return redirect()->back()->with('success' , 'Comment added');
+    }
 }

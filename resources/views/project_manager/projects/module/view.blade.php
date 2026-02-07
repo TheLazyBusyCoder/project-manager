@@ -5,6 +5,17 @@
 @section('head')
     <link rel="stylesheet" href="{{asset('css/vis.min.css')}}">
     <script src="{{asset('js/vis.min.js')}}"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+
 @endsection
 
 @section('sidebar')
@@ -97,6 +108,7 @@
         <div class="tab" data-tab="tasks">TASKS</div>
         <div class="tab" data-tab="createTask">CREATE TASK</div>
         <div class="tab" data-tab="viewDocumentation">DOCUMENTATION</div>
+        <div class="tab" data-tab="viewBugs">BUGS</div>
     </div>
 
     <hr>
@@ -318,6 +330,74 @@
         </form>
     </div>
 
+    <div class="tab-content" id="viewDocumentation" style="display:none;">
+        @if ($documentation)
+            <p>Title: {{$documentation->title}}</p>
+            <p>Version: {{$documentation->version}}</p>
+            <div id="editor">
+            </div>
+        @else 
+            <p>No documentation has been created for this module</p>
+        @endif
+    </div>
+
+    <div class="tab-content" id="viewBugs" style="display:none;">
+        <div class="card">
+            <h3>Reported Bugs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Reporter</th>
+                        <th>Attachments</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($bugs as $bug)
+                        <tr>
+                            <td>{{ $bug->title }}</td>
+                            <td>{{ ucfirst($bug->severity) }}</td>
+                            <td>{{ ucfirst(str_replace('_',' ', $bug->status)) }}</td>
+                            <td>{{ optional($bug->reporter)->name ?? '—' }}</td>
+                            <td>
+                                @forelse($bug->attachments as $file)
+                                    <a href="{{ asset('storage/'.$file->file_path) }}" target="_blank">
+                                        {{ basename($file->file_path) }}
+                                    </a><br>
+                                @empty
+                                    —
+                                @endforelse
+                            </td>
+                            <td>
+                                <a href="{{route('pm.bugs.view' , $bug->id)}}" class="btn">View</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4">No bugs reported.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
+@endsection
+
+@section('script')
+<script>
+    const quill = new Quill('#editor', {
+        modules: {
+        syntax: true,
+        },
+        placeholder: 'Compose an epic...',
+        theme: 'snow',
+    });
+    quill.root.innerHTML = @json($documentation->content ?? '');
+</script>
 @endsection
