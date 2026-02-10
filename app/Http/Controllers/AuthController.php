@@ -22,7 +22,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             return match (auth()->user()->role) {
                 'admin' => redirect()->to('/admin'),
-                'project_manager' => redirect()->to('/project-manager'),
+                'project_manager' => redirect()->to('/pm'),
                 'developer' => redirect()->to('/developer'),
                 'tester' => redirect()->to('/tester'),
                 default => abort(403),

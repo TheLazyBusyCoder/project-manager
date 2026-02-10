@@ -2,7 +2,7 @@
 @extends('layout.developer-layout')
 
 @section('main')
-<div class="container-fluid">
+<div class="container">
 
     <h4 class="mb-3">My Task</h4>
     <p class="text-muted">Manage and track all your tasks.</p>
@@ -10,8 +10,8 @@
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-bordered mb-0 align-middle">
-                    <thead class="table-light">
+                <table class="table">
+                    <thead class="">
                         <tr>
                             <th>#</th>
                             <th>Title</th>
@@ -55,7 +55,7 @@
                         @empty
                             <tr>
                                 <td colspan="8" class="text-center text-muted py-4">
-                                    😌 Nice, no tasks pending
+                                    Nice, no tasks pending
                                 </td>
                             </tr>
                         @endforelse

@@ -2,5 +2,7 @@
 @extends('layout.developer-layout')
 
 @section('main')
-Dashboard
+<div class="container">
+    Dashboard
+</div>
 @endsection

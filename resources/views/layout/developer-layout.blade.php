@@ -18,7 +18,7 @@
 
     {{-- Navbar --}}
     <nav class="navbar navbar-expand-lg border-bottom">
-        <div class="container-fluid px-4">
+        <div class="container px-4">
 
             <a class="navbar-brand" href="{{ route('developer.dashboard') }}">
                 Project Manager

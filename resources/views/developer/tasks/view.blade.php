@@ -16,7 +16,7 @@
 @endsection
 
 @section('main')
-    <div class="container-fluid">
+    <div class="container">
 
         <h4 class="mb-3">My Task</h4>
         <p class="text-muted">Manage and track all your tasks.</p>
@@ -83,7 +83,7 @@
                     </div>
                 </form>
 
-                <table class="table table-striped">
+                <table class="table">
                     <thead>
                         <tr>
                             <th>#</th>

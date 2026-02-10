@@ -5,62 +5,6 @@
 
 @section('main')
 
-
-<style>
-    .container {
-        max-width: 900px;
-        margin: 10px auto;
-        font-family: Arial, sans-serif;
-    }
-
-    h1 {
-        font-size: 22px;
-        margin-bottom: 10px;
-    }
-
-    p {
-        color: #555;
-        margin-bottom: 20px;
-    }
-
-    .card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-    }
-
-    .card h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .actions {
-        margin-bottom: 15px;
-        margin-top: 15px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
-
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    .status-active {
-        color: green;
-    }
-
-    .status-inactive {
-        color: red;
-    }
-</style>
-
 <div class="container">
 
     <!-- Tabs -->
